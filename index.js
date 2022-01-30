@@ -1,5 +1,8 @@
 "use strict";
 
+const blue = "#089EC8";
+const gray = "rgba(0, 0, 0, 0.87)";
+
 const apiURL = "https://api.ellipsis-drive.com/v1";
 
 const depthFactor = 15;
@@ -47,6 +50,19 @@ class Folder {
   }
 }
 
+const arrowDown = () => {
+    let elem = arrowRight();
+    elem.style.transform = "rotate(-90deg)";
+    return elem;
+}
+
+const arrowRight = () => {
+    const svg1 = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg1.innerHTML = `<path d="M7 10l5 5 5-5z"></path>`;
+    svg1.style.fill = "rgba(0, 0, 0, 0.54)";
+    return svg1;
+}
+
 class Drive {
   loginHTML = `<p>Please log in: <button onclick="this.openLogin">login</button></p>`;
 
@@ -89,7 +105,7 @@ class Drive {
       ],
       blocks: [],
     };
-
+    
     this.settings = { ...this.defaultSettings, ...options };
 
     this.render();
@@ -188,14 +204,30 @@ class Drive {
     });
   };
 
-  renderBlock = (block) => {
-    let div = document.createElement("div");
-    // TODO add the p to the div, and set the onclick on the div instead of the p
-    let elem = this.p(`- ${block.name}`, block.depth);
-    elem.onclick = () => {
-      return block;
+  attachMouseEnter = (elem) => {
+    elem.style.color = gray;
+
+    elem.style.cursor = "pointer";
+
+    elem.onmouseenter = () => {
+        elem.style.color = blue;
+    };
+
+    elem.onmouseleave = () => {
+        elem.style.color = gray;
     };
     return elem;
+  }
+
+  renderBlock = (block) => {
+    let elem = this.p(`- ${block.name}`, block.depth);
+    elem.onclick = () => {
+      console.log("BLOCK CLICKED");
+      console.log(block)
+      return block;
+    };
+
+    return this.attachMouseEnter(elem);
   };
 
   renderFolder = (folder) => {
@@ -219,6 +251,7 @@ class Drive {
     if (!folder.trueRoot) {
       startdiv.onclick = (input) => this.func(folder, input);
       let toBeAdded = this.p(`- ${folder.text}`, folder.depth);
+      toBeAdded = this.attachMouseEnter(toBeAdded);
       startdiv.appendChild(toBeAdded);
     }
 
