@@ -51,16 +51,19 @@ class Folder {
 }
 
 const arrowDown = () => {
-    let elem = arrowRight();
-    elem.style.transform = "rotate(-90deg)";
-    return elem;
-}
-
-const arrowRight = () => {
     const svg1 = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     svg1.innerHTML = `<path d="M7 10l5 5 5-5z"></path>`;
     svg1.style.fill = "rgba(0, 0, 0, 0.54)";
+    svg1.style.height = 15;
+    svg1.style.width  = 15;
+    svg1.style.transition = "transform 195ms cubic-bezier(0.4, 0, 0.6, 1) 0ms";
     return svg1;
+}
+
+const arrowRight = () => {
+  let elem = arrowDown();
+  elem.style.transform = "rotate(-90deg)";
+  return elem;
 }
 
 class Drive {
@@ -76,9 +79,9 @@ class Drive {
     loggedIn: false,
     token: null,
     types: "",
-    onClick: (data) => {
+    callback: (data) => {
       console.log(
-        "Default onClick is called, please provide your own callback!",
+        "Default callback is called, please provide your own callback!",
         data
       );
     },
@@ -107,6 +110,21 @@ class Drive {
     };
     
     this.settings = { ...this.defaultSettings, ...options };
+
+
+
+    if('token' in options){
+      this.settings.token = options.token;
+      this.settings.loggedIn = true;
+    } else {
+      // find out if there's a token for us in the url
+      const queryString = window.location.search;
+      const urlParams = new URLSearchParams(queryString);
+      if (urlParams.has('token')){
+        this.settings.token = urlParams.get('token');
+        this.settings.loggedIn = true;
+      }
+    }
 
     this.render();
   }
@@ -149,7 +167,7 @@ class Drive {
 
     let headers = {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${this.token}`,
+      Authorization: `Bearer ${this.settings.token}`,
     };
     console.log(headers);
     let request = await fetch(url, {
@@ -169,6 +187,7 @@ class Drive {
     folder.name = inputFolder.name;
     folder.id = inputFolder.id;
     folder.text = inputFolder.name;
+    folder.obj = inputFolder;
     return folder;
   };
 
@@ -177,6 +196,7 @@ class Drive {
     block.type = inputBlock.type;
     block.id = inputBlock.id;
     block.name = inputBlock.name;
+    block.obj = inputBlock;
     return block;
   };
 
@@ -222,9 +242,7 @@ class Drive {
   renderBlock = (block) => {
     let elem = this.p(`- ${block.name}`, block.depth);
     elem.onclick = () => {
-      console.log("BLOCK CLICKED");
-      console.log(block)
-      return block;
+      this.settings.callback(block.obj);
     };
 
     return this.attachMouseEnter(elem);
@@ -250,8 +268,17 @@ class Drive {
 
     if (!folder.trueRoot) {
       startdiv.onclick = (input) => this.func(folder, input);
-      let toBeAdded = this.p(`- ${folder.text}`, folder.depth);
+      let toBeAdded = this.p(`${folder.text}`, folder.depth);
+      toBeAdded.style.marginLeft = "10px";
       toBeAdded = this.attachMouseEnter(toBeAdded);
+
+      let arrow = arrowRight();
+      if (folder.showExpanded){
+        arrow = arrowDown();
+      }
+      arrow.style.float = "left";
+      arrow.style.marginLeft = "-10px";
+      startdiv.appendChild(arrow);
       startdiv.appendChild(toBeAdded);
     }
 
@@ -281,7 +308,36 @@ class Drive {
     console.log("Render called");
     console.log(this.root);
     this.settings.div.innerHTML = "";
-    this.settings.div.appendChild(this.renderFolder(this.root));
+
+    if (!this.settings.loggedIn){
+
+
+      console.log("Not logged in");
+      this.settings.div.appendChild(this.p("Not logged in"));
+      
+      let button = document.createElement("button");
+      button.onclick = () => {window.location=`https://app.ellipsis-drive.com/login?referer=${window.location.href}`;};
+      //button.onclick = () => {window.location=`https://app.ellipsis-drive.com?referer=https://nu.nl`;};
+      button.innerHTML = "Log in";
+      button.style.color  = "#fff";
+      button.style.backgroundColor = "#089EC8";
+      button.style.boxShadow  = "0px 3px 1px -2px rgba(0,0,0,0.2),0px 2px 2px 0px rgba(0,0,0,0.14),0px 1px 5px 0px rgba(0,0,0,0.12)";
+      button.style.padding = "6px 16px";
+      button.style.fontSize = "1rem";
+      button.style.minWidth = "64px";
+      button.style.boxSizing = "border-box";
+      button.style.transition = `"background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,border 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms`;
+      button.style.fontFamily = ["Roboto Condensed","Roboto","-apple-system","BlinkMacSystemFont","Segoe UI","Helvetica Neue","Arial","sans-serif","Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Exo 2"];
+      button.style.fontWeight = "500";
+      button.style.lineHeight = "1.75";
+      button.style.borderRadius = "4px";
+      button.style.letterSpacing = "0.5px";
+      button.style.textTransform = "uppercase";
+      button.style.border = 0;
+      this.settings.div.appendChild(button);
+    } else {
+      this.settings.div.appendChild(this.renderFolder(this.root));
+    }
   };
 }
 
