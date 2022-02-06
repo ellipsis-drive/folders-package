@@ -1,4 +1,4 @@
-import Drive from './index.js';
+import Drive from './folders.js';
 
 let cb = (block) => {
     console.log("I am a callback!");
