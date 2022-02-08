@@ -71,8 +71,10 @@ const arrowRight = (depth = 0) => {
 
 const getFolderSVG = (id, depth = 0) => {
   const svg1 = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  svg1.style.height = 15;
-  svg1.style.width  = 15;
+  svg1.style.height = 23;
+  svg1.style.width  = 23;
+  svg1.style.position = "relative";
+  svg1.style.bottom = 5;
   svg1.style.fill = svggray;
   svg1.style.cursor = "pointer";
   svg1.style.marginLeft = depthFactor * depth + 10;
@@ -103,11 +105,12 @@ const getVectorSVG = (depth) => {
   div.style.width = "20px";
   div.style.alignItems = "center";
   div.style.display = "flex";
+  div.style.float = "left";
+  div.style.marginLeft = depthFactor * (depth+1);
   
   const svg1 = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   svg1.style.height = 15;
   svg1.style.cursor = "pointer";
-  svg1.style.marginLeft = depthFactor * depth + 10;
   svg1.style.float  = "left";
   svg1.classList.add("ellipsis-vector-icon");
   svg1.innerHTML = `<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="draw-polygon" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="#FFFFFF" d="M384 352c-.35 0-.67.1-1.02.1l-39.2-65.32c5.07-9.17 8.22-19.56 8.22-30.78s-3.14-21.61-8.22-30.78l39.2-65.32c.35.01.67.1 1.02.1 35.35 0 64-28.65 64-64s-28.65-64-64-64c-23.63 0-44.04 12.95-55.12 32H119.12C108.04 44.95 87.63 32 64 32 28.65 32 0 60.65 0 96c0 23.63 12.95 44.04 32 55.12v209.75C12.95 371.96 0 392.37 0 416c0 35.35 28.65 64 64 64 23.63 0 44.04-12.95 55.12-32h209.75c11.09 19.05 31.49 32 55.12 32 35.35 0 64-28.65 64-64 .01-35.35-28.64-64-63.99-64zm-288 8.88V151.12A63.825 63.825 0 0 0 119.12 128h208.36l-38.46 64.1c-.35-.01-.67-.1-1.02-.1-35.35 0-64 28.65-64 64s28.65 64 64 64c.35 0 .67-.1 1.02-.1l38.46 64.1H119.12A63.748 63.748 0 0 0 96 360.88zM272 256c0-8.82 7.18-16 16-16s16 7.18 16 16-7.18 16-16 16-16-7.18-16-16zM400 96c0 8.82-7.18 16-16 16s-16-7.18-16-16 7.18-16 16-16 16 7.18 16 16zM64 80c8.82 0 16 7.18 16 16s-7.18 16-16 16-16-7.18-16-16 7.18-16 16-16zM48 416c0-8.82 7.18-16 16-16s16 7.18 16 16-7.18 16-16 16-16-7.18-16-16zm336 16c-8.82 0-16-7.18-16-16s7.18-16 16-16 16 7.18 16 16-7.18 16-16 16z"></path></svg>`;
@@ -123,13 +126,14 @@ const getRasterSVG = (depth) => {
   div.style.width = "20px";
   div.style.alignItems = "center";
   div.style.display = "flex";
+  div.style.float = "left";
+  div.style.marginLeft = depthFactor * (depth+1);
   
 
   const svg1 = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   svg1.style.height = 15;
   svg1.style.fill = "#FFFFFF";
   svg1.style.cursor = "pointer";
-  svg1.style.marginLeft = depthFactor * depth + 10;
   svg1.style.float  = "left";
   svg1.classList.add("ellipsis-raster-icon");
   svg1.innerHTML = `<svg focusable="false" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z"></path></svg>`;
@@ -324,9 +328,9 @@ class Drive {
     };
     elem = this.attachMouseEnter(elem);
     if (block.type == "map"){
-      div.appendChild(getRasterSVG());
+      div.appendChild(getRasterSVG(block.depth));
     } else {
-      div.appendChild(getVectorSVG());
+      div.appendChild(getVectorSVG(block.depth));
     }
     div.appendChild(elem);
     return div;
