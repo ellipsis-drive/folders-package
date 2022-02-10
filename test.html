@@ -1,7 +1,7 @@
 <html>
   <head>
     <script type="module">
-      import Drive from "./folders.js";
+      import EllipsisDrive from "./folders-min.js";
 
       let cb = (block) => {
         console.log("I am a callback!");
@@ -9,7 +9,7 @@
       };
 
       let div = document.getElementById("test");
-      let myDrive = new Drive({ div: div, cb: cb });
+      let myDrive = new EllipsisDrive({ div: div, cb: cb });
     </script>
   </head>
   <body>

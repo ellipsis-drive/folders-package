@@ -179,6 +179,7 @@ class EllipsisDrive {
 
     if (!("div" in options)) {
       console.warn("No div is provided!");
+      return;
     }
 
     if ("token" in options) {
