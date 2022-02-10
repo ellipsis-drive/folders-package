@@ -2,7 +2,7 @@
 
 This package allows you to easily use Ellipsis Drive on your website.
 
---- gif
+![Gif of the folders package](https://github.com/ellipsis-drive/folders-package/blob/main/img/folders.gif)
 
 ### Installing the folder package
 
