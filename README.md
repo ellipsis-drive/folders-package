@@ -16,4 +16,34 @@ NPM is coming
 
 ### Using the package
 
-Example ---
+Import the folders package. Construct a Drive object, passing an object as paramater containing two variables:
+
+1. "div", an HTML element where the folder browser should be displayed in
+2. "cb", the callback function to be called when a block is clicked
+
+An example:
+
+test.html
+
+    <html>
+        <head>
+            <script type="module" src="test.js">
+            </script>
+        </head>
+        <body>
+            <div id="test">
+            </div>
+        </body>
+    </html>
+
+test.js
+
+    import Drive from './folders.js';
+
+    let cb = (block) => {
+    console.log("I am a callback!");
+    console.log(block);
+    }
+
+    let div = document.getElementById("test");
+    let myDrive = new Drive({div: div, callback: cb});

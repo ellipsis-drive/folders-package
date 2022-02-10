@@ -146,7 +146,7 @@ class Drive {
     loggedIn: false,
     token: null,
     types: "",
-    callback: (data) => {
+    cb: (data) => {
       console.log(
         "Default callback is called, please provide your own callback!"
       );
@@ -319,7 +319,7 @@ class Drive {
     let elem = this.p(`${block.name}`, block.depth);
     elem.style.paddingLeft = parseInt(elem.style.paddingLeft) + 20;
     elem.onclick = () => {
-      this.settings.callback(block.obj);
+      this.settings.cb(block.obj);
     };
     elem = this.attachMouseEnter(elem);
     if (block.type == "map") {
