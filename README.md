@@ -31,7 +31,8 @@ test.html
     <html>
         <head>
             <script type="module">
-                import Drive from './folders.js';
+                import EllipsisDrive from './folders-min.js';
+
                 let cb = (block) => {
                     console.log("I am a callback!");
                     console.log(block);
