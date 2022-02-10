@@ -2,7 +2,7 @@
 
 This package allows you to easily use Ellipsis Drive on your website.
 
-![Gif of the folders package](https://github.com/ellipsis-drive/folders-package/blob/main/img/folders.gif)
+![Gif of the folders package in action](https://github.com/ellipsis-drive/folders-package/blob/main/img/folders.gif)
 
 ### Installing the folder package
 
@@ -10,24 +10,35 @@ All releases of this package are listed in the release list on github here. To i
 
 ### Importing the package
 
-With script tags
-
-NPM is coming
+This will be added later.
 
 ### Using the package
 
-Import the folders package. Construct a Drive object, passing an object as paramater containing two variables:
+Place folders.js in your project directory. Construct an EllipsisDrive object, passing an object as paramater containing two or three variables:
 
 1. "div", an HTML element where the folder browser should be displayed in
 2. "cb", the callback function to be called when a block is clicked
+3. "token" (optional), the (Ellipsis) api token to be used
 
-An example:
+If no token is provided, the user will be prompted to log in. The user will be redirected to Ellipsis Drive, and, after succesfully loging in, will be returned to the current page.
+
+![Image of the log in prompt](https://github.com/ellipsis-drive/folders-package/blob/main/img/login.png)
+
+An example of the package:
 
 test.html
 
     <html>
         <head>
-            <script type="module" src="test.js">
+            <script type="module">
+                import Drive from './folders.js';
+                let cb = (block) => {
+                    console.log("I am a callback!");
+                    console.log(block);
+                }
+
+                let div = document.getElementById("test");
+                let myDrive = new EllipsisDrive({div: div, callback: cb});
             </script>
         </head>
         <body>
@@ -35,15 +46,3 @@ test.html
             </div>
         </body>
     </html>
-
-test.js
-
-    import Drive from './folders.js';
-
-    let cb = (block) => {
-    console.log("I am a callback!");
-    console.log(block);
-    }
-
-    let div = document.getElementById("test");
-    let myDrive = new Drive({div: div, callback: cb});

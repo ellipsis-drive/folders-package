@@ -29,7 +29,7 @@ class EllipsisFolder {
   }
 }
 
-class Drive {
+class EllipsisDrive {
   BLUE = "#089EC8";
   GRAY = "rgba(0, 0, 0, 0.87)";
   SVGGRAY = "rgba(0, 0, 0, 0.54)";
@@ -176,6 +176,10 @@ class Drive {
     };
 
     this.settings = { ...this.defaultSettings, ...options };
+
+    if (!("div" in options)) {
+      console.warn("No div is provided!");
+    }
 
     if ("token" in options) {
       this.settings.token = options.token;
@@ -465,4 +469,4 @@ class Drive {
   };
 }
 
-export default Drive;
+export default EllipsisDrive;
