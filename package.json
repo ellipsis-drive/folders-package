@@ -1,0 +1,32 @@
+{
+  "name": "ellipsis-folders",
+  "version": "0.0.0",
+  "description": "Access your ellipsis drive folder.",
+  "private": false,
+  "keywords": [
+    "Ellipsis",
+    "Ellipsis Drive",
+    "Ellipsis Folders",
+    "Ellipsis Drive Folders"
+  ],
+  "main": "build/ellipsis-folders.js",
+  "module": "build/ellipsis-folders.js",
+  "author": "Floyd Remmerswaal",
+  "files": [
+    "build",
+    "README.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ellipsis-drive/folders-package.git"
+  },
+  "scripts": {
+    "build": "webpack --config webpack.config.build.js",
+    "start": "webpack --config webpack.config.js --watch & live-server src/test/dist"
+  },
+  "devDependencies": {
+    "live-server": "^1.2.1",
+    "webpack": "^5.65.0",
+    "webpack-cli": "^4.9.1"
+  }
+}
