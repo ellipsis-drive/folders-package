@@ -4,6 +4,8 @@ class EllipsisBlock {
   type = undefined;
   name = undefined;
   id = undefined;
+  layers = undefined;
+  showExpanded = false;
 }
 
 class EllipsisFolder {
@@ -69,6 +71,23 @@ class EllipsisDrive {
     return elem;
   };
 
+  refreshSVG = (depth = 0) => {
+    const svg1 = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg1.innerHTML = `
+    <path d="M460.656,132.911c-58.7-122.1-212.2-166.5-331.8-104.1c-9.4,5.2-13.5,16.6-8.3,27c5.2,9.4,16.6,13.5,27,8.3
+        c99.9-52,227.4-14.9,276.7,86.3c65.4,134.3-19,236.7-87.4,274.6c-93.1,51.7-211.2,17.4-267.6-70.7l69.3,14.5
+        c10.4,2.1,21.8-4.2,23.9-15.6c2.1-10.4-4.2-21.8-15.6-23.9l-122.8-25c-20.6-2-25,16.6-23.9,22.9l15.6,123.8
+        c1,10.4,9.4,17.7,19.8,17.7c12.8,0,20.8-12.5,19.8-23.9l-6-50.5c57.4,70.8,170.3,131.2,307.4,68.2
+        C414.856,432.511,548.256,314.811,460.656,132.911z"/>`;
+    svg1.style.fill = "red";
+    svg1.style.height = 150;
+    svg1.style.width = 150;
+    svg1.style.cursor = "pointer";
+    svg1.setAttribute("viewBox", "0 0 24 24");
+    //svg1.style.marginLeft = this.DEPTHFACTOR * depth;
+    return svg1;
+  }
+
   getFolderSVG = (id, depth = 0) => {
     const svg1 = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     svg1.style.height = 23;
@@ -106,7 +125,7 @@ class EllipsisDrive {
     div.style.alignItems = "center";
     div.style.display = "flex";
     div.style.float = "left";
-    div.style.marginLeft = this.DEPTHFACTOR * (depth + 1);
+    div.style.marginLeft = this.DEPTHFACTOR * (depth) - 20;
 
     const svg1 = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     svg1.style.height = 15;
@@ -127,7 +146,7 @@ class EllipsisDrive {
     div.style.alignItems = "center";
     div.style.display = "flex";
     div.style.float = "left";
-    div.style.marginLeft = this.DEPTHFACTOR * (depth + 1);
+    div.style.marginLeft = this.DEPTHFACTOR * (depth) - 20;
 
     const svg1 = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     svg1.style.height = 15;
@@ -154,6 +173,8 @@ class EllipsisDrive {
     icon: "default",
     onlyFolders: false,
     div: null,
+    showRaster: true,
+    showVector: true,
   };
 
   settings = {};
@@ -265,6 +286,11 @@ class EllipsisDrive {
     block.id = inputBlock.id;
     block.name = inputBlock.name;
     block.obj = inputBlock;
+    if (block.type == "map"){
+      block.layers = inputBlock.mapLayers;
+    } else {
+      block.layers = inputBlock.geometryLayers; //check
+    }
     return block;
   };
 
@@ -291,7 +317,7 @@ class EllipsisDrive {
     });
   };
 
-  attachMouseEnter = (elem, extra) => {
+  attachMouseEnter = (elem, extra, refresh) => {
     elem.style.color = this.GRAY;
     if (!extra) {
       extra = [];
@@ -299,8 +325,17 @@ class EllipsisDrive {
 
     elem.style.cursor = "pointer";
 
-    let turnColor = (color, svgcolor) => {
+    let turnColor = (color, svgcolor, onEnter) => {
       let func = () => {
+
+        if (refresh != null){
+          if (onEnter){
+            refresh.style.display = "none";
+          } else {
+            refresh.style.display =  "initial";
+          }
+        }
+
         elem.style.color = color;
         for (const extr of extra) {
           extr.style.fill = svgcolor;
@@ -309,30 +344,63 @@ class EllipsisDrive {
       return func;
     };
 
-    elem.onmouseenter = turnColor(this.BLUE, this.BLUE);
-    elem.onmouseleave = turnColor(this.GRAY, this.SVGGRAY);
+    elem.onmouseenter = turnColor(this.BLUE, this.BLUE, true);
+    elem.onmouseleave = turnColor(this.GRAY, this.SVGGRAY, false);
     for (const extr of extra) {
-      extr.onmouseenter = turnColor(this.BLUE, this.BLUE);
-      extr.onmouseleave = turnColor(this.GRAY, this.SVGGRAY);
+      extr.onmouseenter = turnColor(this.BLUE, this.BLUE, true);
+      extr.onmouseleave = turnColor(this.GRAY, this.SVGGRAY, false);
     }
 
     return elem;
   };
 
   renderBlock = (block) => {
+
     let div = document.createElement("div");
-    let elem = this.p(`${block.name}`, block.depth);
-    elem.style.paddingLeft = parseInt(elem.style.paddingLeft) + 20;
-    elem.onclick = () => {
-      this.settings.cb(block.obj);
-    };
-    elem = this.attachMouseEnter(elem);
-    if (block.type == "map") {
-      div.appendChild(this.getRasterSVG(block.depth));
-    } else {
-      div.appendChild(this.getVectorSVG(block.depth));
+
+    if (block.type == "map" && !this.settings.showRaster){
+      div.style.display = "none";
     }
+    
+    if (block.type == "shape" && !this.settings.showVector){
+      div.style.display = "none";
+    }
+
+    let elem = this.p(`${block.name}`, block.depth);
+    elem.style.paddingLeft = parseInt(elem.style.paddingLeft);
+    elem.onclick = () => {
+      block.showExpanded = !block.showExpanded;
+      this.render();
+    };
+
+    let arrow = block.showExpanded ? this.arrowDown(block.depth) : this.arrowRight(block.depth);
+    let icon = block.type == "map" ? this.getRasterSVG(block.depth): this.getVectorSVG(block.depth);
+
+    elem = this.attachMouseEnter(elem, [arrow, icon]);
+
+    arrow.style.float = "left";
+
+    div.appendChild(arrow);
+    div.appendChild(icon);
     div.appendChild(elem);
+
+    if (block.showExpanded){
+      for (const layer of block.layers){
+        if (layer.deleted){
+          continue;
+        }
+        let layerelem = this.p(layer.name, block.depth + 1);
+        layerelem.style.paddingLeft = parseInt(layerelem.style.paddingLeft) + 20;
+        layerelem = this.attachMouseEnter(layerelem);
+        layerelem.onclick = () => {
+          this.settings.cb(layer);
+        }
+        
+        div.appendChild(layerelem);
+      }
+      
+    }
+
     return div;
   };
 
@@ -358,18 +426,18 @@ class EllipsisDrive {
       let toBeAdded = this.p(`${folder.text}`, folder.depth);
       toBeAdded.style.marginLeft = "20px";
 
-      let arrow = this.arrowRight(folder.depth);
-      if (folder.showExpanded) {
-        arrow = this.arrowDown(folder.depth);
-      }
+      let arrow = folder.showExpanded ? this.arrowDown(folder.depth) : this.arrowRight(folder.depth);
+
+      let refresh = this.refreshSVG();
 
       let foldericon = this.getFolderSVG(folder.id);
-      toBeAdded = this.attachMouseEnter(toBeAdded, [arrow, foldericon]);
+      toBeAdded = this.attachMouseEnter(toBeAdded, [arrow, foldericon], refresh);
 
       arrow.style.float = "left";
       startdiv.appendChild(arrow);
       startdiv.appendChild(foldericon);
       startdiv.appendChild(toBeAdded);
+      //startdiv.appendChild(refresh);
     }
 
     // if a folder should be expanded, but is not yet: expand it
