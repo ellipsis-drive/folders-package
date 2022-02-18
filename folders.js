@@ -86,7 +86,7 @@ class EllipsisDrive {
     svg1.setAttribute("viewBox", "0 0 24 24");
     //svg1.style.marginLeft = this.DEPTHFACTOR * depth;
     return svg1;
-  }
+  };
 
   getFolderSVG = (id, depth = 0) => {
     const svg1 = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -125,7 +125,7 @@ class EllipsisDrive {
     div.style.alignItems = "center";
     div.style.display = "flex";
     div.style.float = "left";
-    div.style.marginLeft = this.DEPTHFACTOR * (depth) - 20;
+    div.style.marginLeft = this.DEPTHFACTOR * depth - 20;
 
     const svg1 = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     svg1.style.height = 15;
@@ -146,7 +146,7 @@ class EllipsisDrive {
     div.style.alignItems = "center";
     div.style.display = "flex";
     div.style.float = "left";
-    div.style.marginLeft = this.DEPTHFACTOR * (depth) - 20;
+    div.style.marginLeft = this.DEPTHFACTOR * depth - 20;
 
     const svg1 = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     svg1.style.height = 15;
@@ -197,6 +197,10 @@ class EllipsisDrive {
     };
 
     this.settings = { ...this.defaultSettings, ...options };
+
+    this.searching = false;
+    this.activeSearch = false;
+    this.searchString = "";
 
     if (!("div" in options)) {
       console.warn("No div is provided!");
@@ -286,7 +290,7 @@ class EllipsisDrive {
     block.id = inputBlock.id;
     block.name = inputBlock.name;
     block.obj = inputBlock;
-    if (block.type == "map"){
+    if (block.type == "map") {
       block.layers = inputBlock.mapLayers;
     } else {
       block.layers = inputBlock.geometryLayers; //check
@@ -327,12 +331,11 @@ class EllipsisDrive {
 
     let turnColor = (color, svgcolor, onEnter) => {
       let func = () => {
-
-        if (refresh != null){
-          if (onEnter){
+        if (refresh != null) {
+          if (onEnter) {
             refresh.style.display = "none";
           } else {
-            refresh.style.display =  "initial";
+            refresh.style.display = "initial";
           }
         }
 
@@ -355,14 +358,13 @@ class EllipsisDrive {
   };
 
   renderBlock = (block) => {
-
     let div = document.createElement("div");
 
-    if (block.type == "map" && !this.settings.showRaster){
+    if (block.type == "map" && !this.settings.showRaster) {
       div.style.display = "none";
     }
-    
-    if (block.type == "shape" && !this.settings.showVector){
+
+    if (block.type == "shape" && !this.settings.showVector) {
       div.style.display = "none";
     }
 
@@ -373,8 +375,13 @@ class EllipsisDrive {
       this.render();
     };
 
-    let arrow = block.showExpanded ? this.arrowDown(block.depth) : this.arrowRight(block.depth);
-    let icon = block.type == "map" ? this.getRasterSVG(block.depth): this.getVectorSVG(block.depth);
+    let arrow = block.showExpanded
+      ? this.arrowDown(block.depth)
+      : this.arrowRight(block.depth);
+    let icon =
+      block.type == "map"
+        ? this.getRasterSVG(block.depth)
+        : this.getVectorSVG(block.depth);
 
     elem = this.attachMouseEnter(elem, [arrow, icon]);
 
@@ -384,21 +391,21 @@ class EllipsisDrive {
     div.appendChild(icon);
     div.appendChild(elem);
 
-    if (block.showExpanded){
-      for (const layer of block.layers){
-        if (layer.deleted){
+    if (block.showExpanded) {
+      for (const layer of block.layers) {
+        if (layer.deleted) {
           continue;
         }
         let layerelem = this.p(layer.name, block.depth + 1);
-        layerelem.style.paddingLeft = parseInt(layerelem.style.paddingLeft) + 20;
+        layerelem.style.paddingLeft =
+          parseInt(layerelem.style.paddingLeft) + 20;
         layerelem = this.attachMouseEnter(layerelem);
         layerelem.onclick = () => {
           this.settings.cb(layer);
-        }
-        
+        };
+
         div.appendChild(layerelem);
       }
-      
     }
 
     return div;
@@ -426,12 +433,18 @@ class EllipsisDrive {
       let toBeAdded = this.p(`${folder.text}`, folder.depth);
       toBeAdded.style.marginLeft = "20px";
 
-      let arrow = folder.showExpanded ? this.arrowDown(folder.depth) : this.arrowRight(folder.depth);
+      let arrow = folder.showExpanded
+        ? this.arrowDown(folder.depth)
+        : this.arrowRight(folder.depth);
 
       let refresh = this.refreshSVG();
 
       let foldericon = this.getFolderSVG(folder.id);
-      toBeAdded = this.attachMouseEnter(toBeAdded, [arrow, foldericon], refresh);
+      toBeAdded = this.attachMouseEnter(
+        toBeAdded,
+        [arrow, foldericon],
+        refresh
+      );
 
       arrow.style.float = "left";
       startdiv.appendChild(arrow);
@@ -525,6 +538,84 @@ class EllipsisDrive {
     return div;
   };
 
+  renderSearch = () => {
+    let div = document.createElement("div");
+    if (this.activeSearch) {
+      let p = this.p("Loading..");
+      div.appendChild(p);
+    }
+    return div;
+  };
+
+  performSearch = async (text) => {
+    /*
+    apiurlmaps = f"/account/maps"
+    apiurlshapes = f"/account/shapes"
+    apiurlfolders = f"/account/folders"
+    */
+
+    let urlmaps = `${this.APIURL}/account/maps`;
+    let urlshapes = `${this.APIURL}/account/shapes`;
+    let urlfolders = `${this.APIURL}/account/folders`;
+
+    let urls = [urlmaps, urlshapes, urlfolders];
+
+    let requests = [];
+
+    let params = {
+      access: ["public", "subscribed", "owned", "favorited"],
+      name: text,
+    };
+
+    let headers = {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${this.settings.token}`,
+    };
+
+    for (const url of urls) {
+      requests.push(
+        fetch(url, {
+          method: "POST",
+          body: JSON.stringify(params),
+          headers: headers,
+        })
+      );
+    }
+
+    Promise.all(requests)
+      .then((ret) => {
+        let json = [];
+        for (const prom of ret) {
+          json.push(prom.json());
+        }
+        return Promise.all(json);
+      })
+      .then((ret) => {
+        console.log(ret);
+      });
+  };
+
+  bouncingOnSearchChange = (input) => {
+    let str = input.target.value;
+    this.searchString = str;
+
+    if (str == "") {
+      this.searching = false;
+      this.activeSearch = false;
+      console.log("no longer searching");
+    } else {
+      this.searching = true;
+      this.activeSearch = true;
+
+      console.log(`Searching for ${str}`);
+
+      this.performSearch(this.searchString);
+    }
+    this.render();
+  };
+
+  onSearchChange = this.debounce(this.bouncingOnSearchChange, 200);
+
   render = () => {
     this.settings.div.innerHTML = "";
 
@@ -533,7 +624,20 @@ class EllipsisDrive {
     } else if (this.authError) {
       this.settings.div.appendChild(this.authErrorDiv());
     } else {
-      this.settings.div.appendChild(this.renderFolder(this.root));
+      // first add the search bar
+      let search = document.createElement("input");
+      search.setAttribute("id", "ellipsis-drive-search");
+      search.type = "text";
+      search.placeholder = "Search...";
+      search.value = this.searchString;
+      search.addEventListener("input", this.onSearchChange);
+
+      this.settings.div.appendChild(search);
+      if (this.searching) {
+        this.settings.div.appendChild(this.renderSearch());
+      } else {
+        this.settings.div.appendChild(this.renderFolder(this.root));
+      }
     }
   };
 }
