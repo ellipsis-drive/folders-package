@@ -28,22 +28,21 @@ An example of the package:
 
 test.html
 
-    <html>
-        <head>
-            <script type="module">
-                import EllipsisDrive from './folders-min.js';
-
-                let cb = (block) => {
-                    console.log("I am a callback!");
-                    console.log(block);
-                }
-
-                let div = document.getElementById("test");
-                let myDrive = new EllipsisDrive({div: div, callback: cb});
-            </script>
-        </head>
-        <body>
-            <div id="test">
-            </div>
-        </body>
-    </html>
+```html
+<html>
+  <head>
+    <script src="https://raw.githubusercontent.com/ellipsis-drive/folders-package/npm-support/build/ellipsis-folders.js"></script>
+  </head>
+  <body>
+    <div id="test"></div>
+    <script>
+      let cb = (block) => {
+        console.log("I am a callback!");
+        console.log(block);
+      };
+      let div = document.getElementById("test");
+      let myDrive = new EllipsisDrive({ div: div, callback: cb });
+    </script>
+  </body>
+</html>
+```
