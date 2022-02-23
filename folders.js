@@ -125,7 +125,7 @@ class EllipsisDrive {
     div.style.alignItems = "center";
     div.style.display = "flex";
     div.style.float = "left";
-    div.style.marginLeft = this.DEPTHFACTOR * depth - 20;
+    div.style.marginLeft = 10;
 
     const svg1 = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     svg1.style.height = 15;
@@ -146,7 +146,7 @@ class EllipsisDrive {
     div.style.alignItems = "center";
     div.style.display = "flex";
     div.style.float = "left";
-    div.style.marginLeft = this.DEPTHFACTOR * depth - 20;
+    div.style.marginLeft = 10;
 
     const svg1 = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     svg1.style.height = 15;
@@ -369,11 +369,7 @@ class EllipsisDrive {
     }
 
     let elem = this.p(`${block.name}`, block.depth);
-    elem.style.paddingLeft = parseInt(elem.style.paddingLeft);
-    elem.onclick = () => {
-      block.showExpanded = !block.showExpanded;
-      this.render();
-    };
+    elem.style.marginLeft = 20;
 
     let arrow = block.showExpanded
       ? this.arrowDown(block.depth)
@@ -387,6 +383,15 @@ class EllipsisDrive {
 
     arrow.style.float = "left";
 
+    let func = () => {
+      block.showExpanded = !block.showExpanded;
+      this.render();
+    };
+
+    elem.onclick = func;
+    icon.onclick = func;
+    arrow.onclick = func;
+
     div.appendChild(arrow);
     div.appendChild(icon);
     div.appendChild(elem);
@@ -397,8 +402,7 @@ class EllipsisDrive {
           continue;
         }
         let layerelem = this.p(layer.name, block.depth + 1);
-        layerelem.style.paddingLeft =
-          parseInt(layerelem.style.paddingLeft) + 20;
+        layerelem.style.marginLeft = 20;
         layerelem = this.attachMouseEnter(layerelem);
         layerelem.onclick = () => {
           this.settings.cb(layer);
@@ -632,7 +636,7 @@ class EllipsisDrive {
       search.value = this.searchString;
       search.addEventListener("input", this.onSearchChange);
 
-      this.settings.div.appendChild(search);
+      // this.settings.div.appendChild(search);
       if (this.searching) {
         this.settings.div.appendChild(this.renderSearch());
       } else {
