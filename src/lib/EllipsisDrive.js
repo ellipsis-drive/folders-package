@@ -8,7 +8,8 @@ class EllipsisDrive {
   
     APIURL = "https://api.ellipsis-drive.com/v1";
   
-    DEPTHFACTOR = 25;
+    DEPTHFACTOR = 30;
+    DEPTHCONSTANT = 0;
   
     debounce = (func, timeout = 300) => {
       let timer;
@@ -28,7 +29,7 @@ class EllipsisDrive {
       svg1.style.width = "15px";
       svg1.style.cursor = "pointer";
       svg1.style.transition = "transform 195ms cubic-bezier(0.4, 0, 0.6, 1) 0ms";
-      svg1.style.marginLeft = `${this.DEPTHFACTOR * depth}px`;
+      svg1.style.marginLeft = `${this.DEPTHCONSTANT + this.DEPTHFACTOR * depth}px`;
       svg1.classList.add("ellipsis-folder-arrow-down");
       return svg1;
     };
@@ -66,7 +67,7 @@ class EllipsisDrive {
       svg1.style.bottom = "5px";
       svg1.style.fill = this.SVGGRAY;
       svg1.style.cursor = "pointer";
-      svg1.style.marginLeft = `${this.DEPTHFACTOR * depth + 10}px`;
+      svg1.style.marginLeft = `${this.DEPTHCONSTANT + this.DEPTHFACTOR * depth + 10}px`;
       svg1.style.float = "left";
       svg1.classList.add("ellipsis-folder-icon");
   
@@ -171,9 +172,11 @@ class EllipsisDrive {
       this.searching = false;
       this.activeSearch = false;
       this.searchString = "";
+
+      this.searchResults = [];
   
       if (!("div" in options)) {
-        console.warn("No div is provided!");
+        console.warn("EllipsisDrive: no div is provided!");
         return;
       }
   
@@ -206,7 +209,7 @@ class EllipsisDrive {
     p = (str, depth = 0) => {
       let elem = document.createElement("p");
       elem.innerText = str;
-      elem.style.paddingLeft = `${this.DEPTHFACTOR * depth + 40}px`;
+      elem.style.paddingLeft = `${this.DEPTHCONSTANT + this.DEPTHFACTOR * depth + 40}px`;
       elem.classList.add("ellipsis-folder-p");
       elem.style.fontFamily = `"Roboto Condensed","Roboto","Helvetica","Lucida Sans Unicode","sans-serif"`;
       return elem;
@@ -275,7 +278,7 @@ class EllipsisDrive {
       let blocks = this.getListFolder(folder, "map", isRoot);
       Promise.all([folders, blocks]).then((values) => {
         if (!("result" in values[0])) {
-          this.authError = true;
+          console.warn("EllipsisDrive: Authentication error, your token might be invalid");
           this.render();
           return;
         }
@@ -513,10 +516,31 @@ class EllipsisDrive {
     };
   
     renderSearch = () => {
+      console.log("Rendersearch");
       let div = document.createElement("div");
       if (this.activeSearch) {
         let p = this.p("Loading..");
         div.appendChild(p);
+      } else {
+        console.log("else");
+        if (this.searchResults[0].length === 0 && 
+            this.searchResults[1].length === 0 && 
+            this.searchResults[2].length === 0){
+          div.appendChild(this.p("No results found"));
+        }
+        console.log(this.searchResults);
+        for (folder of this.searchResults[0]){
+          div.appendChild(this.renderFolder(folder));
+        }
+
+        for (block of this.searchResults[1]){
+          div.appendChild(this.renderBlock(block));
+        }
+
+        for (block of this.searchResults[2]){
+          div.appendChild(this.renderBlock(block));
+        }
+
       }
       return div;
     };
@@ -566,6 +590,9 @@ class EllipsisDrive {
         })
         .then((ret) => {
           console.log(ret);
+          this.searchResults = [ret[0].result, ret[1].result, ret[2].result];
+          this.activeSearch = false;
+          this.render();
         });
     };
   
@@ -590,6 +617,17 @@ class EllipsisDrive {
   
     onSearchChange = this.debounce(this.bouncingOnSearchChange, 200);
   
+    getSearchBar = () => {
+      let search = document.createElement("input");
+      search.setAttribute("id", "ellipsis-drive-search");
+      search.style.marginLeft = `${this.DEPTHCONSTANT}px`
+      search.type = "text";
+      search.placeholder = "Search...";
+      search.value = this.searchString;
+      search.addEventListener("input", this.onSearchChange);
+      return search;
+    }
+
     render = () => {
       this.settings.div.innerHTML = "";
   
@@ -599,14 +637,8 @@ class EllipsisDrive {
         this.settings.div.appendChild(this.authErrorDiv());
       } else {
         // first add the search bar
-        let search = document.createElement("input");
-        search.setAttribute("id", "ellipsis-drive-search");
-        search.type = "text";
-        search.placeholder = "Search...";
-        search.value = this.searchString;
-        search.addEventListener("input", this.onSearchChange);
-  
-        // this.settings.div.appendChild(search);
+        let search = this.getSearchBar();
+        this.settings.div.appendChild(search);
         if (this.searching) {
           this.settings.div.appendChild(this.renderSearch());
         } else {
