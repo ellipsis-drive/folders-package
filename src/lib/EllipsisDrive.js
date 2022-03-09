@@ -1,5 +1,5 @@
-import EllipsisBlock from "./EllipsisBlock";
-import EllipsisFolder from "./EllipsisFolder";
+import EllipsisBlock from "./EllipsisBlock.js";
+import EllipsisFolder from "./EllipsisFolder.js";
 
 class EllipsisDrive {
     BLUE = "#089EC8";
@@ -24,11 +24,11 @@ class EllipsisDrive {
       const svg1 = document.createElementNS("http://www.w3.org/2000/svg", "svg");
       svg1.innerHTML = `<svg focusable="false" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10l5 5 5-5z"></path></svg>`;
       svg1.style.fill = this.SVGGRAY;
-      svg1.style.height = 15;
-      svg1.style.width = 15;
+      svg1.style.height = "15px";
+      svg1.style.width = "15px";
       svg1.style.cursor = "pointer";
       svg1.style.transition = "transform 195ms cubic-bezier(0.4, 0, 0.6, 1) 0ms";
-      svg1.style.marginLeft = this.DEPTHFACTOR * depth;
+      svg1.style.marginLeft = `${this.DEPTHFACTOR * depth}px`;
       svg1.classList.add("ellipsis-folder-arrow-down");
       return svg1;
     };
@@ -50,8 +50,8 @@ class EllipsisDrive {
           c1,10.4,9.4,17.7,19.8,17.7c12.8,0,20.8-12.5,19.8-23.9l-6-50.5c57.4,70.8,170.3,131.2,307.4,68.2
           C414.856,432.511,548.256,314.811,460.656,132.911z"/>`;
       svg1.style.fill = "red";
-      svg1.style.height = 150;
-      svg1.style.width = 150;
+      svg1.style.height = "150px";
+      svg1.style.width = "150px";
       svg1.style.cursor = "pointer";
       svg1.setAttribute("viewBox", "0 0 24 24");
       //svg1.style.marginLeft = this.DEPTHFACTOR * depth;
@@ -60,13 +60,13 @@ class EllipsisDrive {
   
     getFolderSVG = (id, depth = 0) => {
       const svg1 = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-      svg1.style.height = 23;
-      svg1.style.width = 23;
+      svg1.style.height = "23px";
+      svg1.style.width = "23px";
       svg1.style.position = "relative";
-      svg1.style.bottom = 5;
+      svg1.style.bottom = "5px";
       svg1.style.fill = this.SVGGRAY;
       svg1.style.cursor = "pointer";
-      svg1.style.marginLeft = this.DEPTHFACTOR * depth + 10;
+      svg1.style.marginLeft = `${this.DEPTHFACTOR * depth + 10}px`;
       svg1.style.float = "left";
       svg1.classList.add("ellipsis-folder-icon");
   
@@ -95,10 +95,10 @@ class EllipsisDrive {
       div.style.alignItems = "center";
       div.style.display = "flex";
       div.style.float = "left";
-      div.style.marginLeft = 10;
+      div.style.marginLeft = "10px";
   
       const svg1 = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-      svg1.style.height = 15;
+      svg1.style.height = "15px";
       svg1.style.cursor = "pointer";
       svg1.style.float = "left";
       svg1.classList.add("ellipsis-vector-icon");
@@ -116,10 +116,10 @@ class EllipsisDrive {
       div.style.alignItems = "center";
       div.style.display = "flex";
       div.style.float = "left";
-      div.style.marginLeft = 10;
+      div.style.marginLeft = "10px";
   
       const svg1 = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-      svg1.style.height = 15;
+      svg1.style.height = "15px";
       svg1.style.fill = "#FFFFFF";
       svg1.style.cursor = "pointer";
       svg1.style.float = "left";
@@ -206,7 +206,7 @@ class EllipsisDrive {
     p = (str, depth = 0) => {
       let elem = document.createElement("p");
       elem.innerText = str;
-      elem.style.paddingLeft = this.DEPTHFACTOR * depth + 40;
+      elem.style.paddingLeft = `${this.DEPTHFACTOR * depth + 40}px`;
       elem.classList.add("ellipsis-folder-p");
       elem.style.fontFamily = `"Roboto Condensed","Roboto","Helvetica","Lucida Sans Unicode","sans-serif"`;
       return elem;
@@ -339,7 +339,7 @@ class EllipsisDrive {
       }
   
       let elem = this.p(`${block.name}`, block.depth);
-      elem.style.marginLeft = 20;
+      elem.style.marginLeft = "20px";
   
       let arrow = block.showExpanded
         ? this.arrowDown(block.depth)
@@ -371,8 +371,8 @@ class EllipsisDrive {
           if (layer.deleted) {
             continue;
           }
-          let layerelem = this.p(layer.name, block.depth + 1);
-          layerelem.style.marginLeft = 20;
+          let layerelem = this.p(layer.name, block.depth);
+          layerelem.style.marginLeft = "20px";
           layerelem = this.attachMouseEnter(layerelem);
           layerelem.onclick = () => {
             this.settings.cb(layer);
