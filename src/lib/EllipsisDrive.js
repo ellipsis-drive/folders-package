@@ -529,16 +529,24 @@ class EllipsisDrive {
           div.appendChild(this.p("No results found"));
         }
         console.log(this.searchResults);
-        for (folder of this.searchResults[0]){
+        
+        console.log("Folders:");
+        for (const folder of this.searchResults[0]){
+
+          console.log(folder);
           div.appendChild(this.renderFolder(folder));
         }
 
-        for (block of this.searchResults[1]){
+        console.log("Maps part 1:");
+        for (const block of this.searchResults[1]){
+          console.log(block);
           div.appendChild(this.renderBlock(block));
         }
 
-        for (block of this.searchResults[2]){
-          div.appendChild(this.renderBlock(block));
+        console.log("Shapes part 2:");
+        for (const block of this.searchResults[2]){
+          console.log(block);
+          div.appendChild(this.fixBlock(block));
         }
 
       }
@@ -556,7 +564,7 @@ class EllipsisDrive {
       let urlshapes = `${this.APIURL}/account/shapes`;
       let urlfolders = `${this.APIURL}/account/folders`;
   
-      let urls = [urlmaps, urlshapes, urlfolders];
+      let urls = [urlfolders, urlmaps, urlshapes];
   
       let requests = [];
   
@@ -590,7 +598,9 @@ class EllipsisDrive {
         })
         .then((ret) => {
           console.log(ret);
-          this.searchResults = [ret[0].result, ret[1].result, ret[2].result];
+          this.searchResults = [ret[0].result.map(this.fixFolder), 
+          ret[1].result.map(this.fixBlock), 
+          ret[2].result.map(this.fixBlock)];
           this.activeSearch = false;
           this.render();
         });
