@@ -143,7 +143,6 @@ class EllipsisDrive {
         );
       },
       icon: "default",
-      onlyFolders: false,
       div: null,
       showRaster: true,
       showVector: true,
@@ -544,28 +543,32 @@ class EllipsisDrive {
         let p = this.p("Loading..");
         div.appendChild(p);
       } else {
-        if (this.searchResults[0].length === 0 && 
-            this.searchResults[1].length === 0 && 
-            this.searchResults[2].length === 0){
-          div.appendChild(this.p("No results found"));
-        }
+        
+        let anything = false;
         
         if (this.settings.searchIncludeFolders){
           for (const folder of this.searchResults[0]){
+            anything = true;
             div.appendChild(this.renderFolder(folder));
           }
         }
 
         if (this.settings.showRaster){
           for (const block of this.searchResults[1]){
+            anything = true;
             div.appendChild(this.renderBlock(block));
           }
         }
 
         if (this.settings.showVector){
           for (const block of this.searchResults[2]){
+            anything = true;
             div.appendChild(this.renderBlock(block));
           }
+        }
+
+        if (!anything) {
+          div.appendChild(this.p("No results found"));
         }
 
       }

@@ -7,4 +7,13 @@ let cb = (block) => {
 };
 
 let div = document.getElementById("test");
-let myDrive = new EllipsisDrive({ div: div, cb: cb });
+
+let options = {
+    div: div, 
+    cb: cb,
+    searchIncludeFolders: true,
+    showVector: true,
+    showRaster: true,
+}
+
+let myDrive = new EllipsisDrive(options);
