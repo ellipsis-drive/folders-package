@@ -45,14 +45,15 @@ class EllipsisDrive {
     refreshSVG = (depth = 0) => {
       const svg1 = document.createElementNS("http://www.w3.org/2000/svg", "svg");
       svg1.innerHTML = `
-      <path d="M460.656,132.911c-58.7-122.1-212.2-166.5-331.8-104.1c-9.4,5.2-13.5,16.6-8.3,27c5.2,9.4,16.6,13.5,27,8.3
-          c99.9-52,227.4-14.9,276.7,86.3c65.4,134.3-19,236.7-87.4,274.6c-93.1,51.7-211.2,17.4-267.6-70.7l69.3,14.5
-          c10.4,2.1,21.8-4.2,23.9-15.6c2.1-10.4-4.2-21.8-15.6-23.9l-122.8-25c-20.6-2-25,16.6-23.9,22.9l15.6,123.8
-          c1,10.4,9.4,17.7,19.8,17.7c12.8,0,20.8-12.5,19.8-23.9l-6-50.5c57.4,70.8,170.3,131.2,307.4,68.2
-          C414.856,432.511,548.256,314.811,460.656,132.911z"/>`;
-      svg1.style.fill = "red";
-      svg1.style.height = "150px";
-      svg1.style.width = "150px";
+      <svg xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://web.resource.org/cc/" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:svg="http://www.w3.org/2000/svg" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:ns1="http://sozi.baierouge.fr" version="1.1" xml:space="preserve" enable-background="new 0 0 65 65" y="0px" x="0px" viewBox="0 0 65 65">
+      <g id="Layer_3_copy_2">
+        <g fill="#089EC8">
+          <path d="m32.5 4.999c-5.405 0-10.444 1.577-14.699 4.282l-5.75-5.75v16.11h16.11l-6.395-6.395c3.18-1.787 6.834-2.82 10.734-2.82 12.171 0 22.073 9.902 22.073 22.074 0 2.899-0.577 5.664-1.599 8.202l4.738 2.762c1.47-3.363 2.288-7.068 2.288-10.964 0-15.164-12.337-27.501-27.5-27.501z"/>
+          <path d="m43.227 51.746c-3.179 1.786-6.826 2.827-10.726 2.827-12.171 0-22.073-9.902-22.073-22.073 0-2.739 0.524-5.35 1.439-7.771l-4.731-2.851c-1.375 3.271-2.136 6.858-2.136 10.622 0 15.164 12.336 27.5 27.5 27.5 5.406 0 10.434-1.584 14.691-4.289l5.758 5.759v-16.112h-16.111l6.389 6.388z"/>
+        </g>
+      </g>`;
+      svg1.style.height = "15px";
+      svg1.style.width = "15px";
       svg1.style.cursor = "pointer";
       svg1.setAttribute("viewBox", "0 0 24 24");
       //svg1.style.marginLeft = this.DEPTHFACTOR * depth;
@@ -146,6 +147,7 @@ class EllipsisDrive {
       div: null,
       showRaster: true,
       showVector: true,
+      searchIncludeFolders: true,
     };
   
     settings = {};
@@ -313,13 +315,18 @@ class EllipsisDrive {
         let func = () => {
           if (refresh != null) {
             if (onEnter) {
-              refresh.style.display = "none";
-            } else {
               refresh.style.display = "initial";
+            } else {
+              refresh.style.display = "none";
             }
           }
   
           elem.style.color = color;
+
+          if (refresh != null){
+            refresh.style.color = svgcolor;
+          }
+
           for (const extr of extra) {
             extr.style.fill = svgcolor;
           }
@@ -422,6 +429,12 @@ class EllipsisDrive {
           : this.arrowRight(folder.depth);
   
         let refresh = this.refreshSVG();
+        refresh.onclick = () => {
+          folder.showExpanded = !folder.showExpanded;
+          folder.foldersExpanded = false;
+          folder.folders = [];
+          folder.blocks = [];
+        };
   
         let foldericon = this.getFolderSVG(folder.id);
         toBeAdded = this.attachMouseEnter(
@@ -429,12 +442,16 @@ class EllipsisDrive {
           [arrow, foldericon],
           refresh
         );
+
+        refresh.style.float = "right";
+        refresh.style.position = "relative";
+        refresh.style.display = "none";
   
         arrow.style.float = "left";
         startdiv.appendChild(arrow);
         startdiv.appendChild(foldericon);
+        startdiv.appendChild(refresh);
         startdiv.appendChild(toBeAdded);
-        //startdiv.appendChild(refresh);
       }
   
       // if a folder should be expanded, but is not yet: expand it
@@ -514,7 +531,6 @@ class EllipsisDrive {
       div.style.textAlign = "center";
   
       let button = this.getButton("Retry", () => {
-        console.log("Retrying render");
         this.render();
       });
       console.warn(`Authentication error, token used is: ${this.settings.token}`);
@@ -523,7 +539,6 @@ class EllipsisDrive {
     };
   
     renderSearch = () => {
-      console.log("Rendersearch");
       let div = document.createElement("div");
       if (this.activeSearch) {
         let p = this.p("Loading..");
@@ -534,17 +549,23 @@ class EllipsisDrive {
             this.searchResults[2].length === 0){
           div.appendChild(this.p("No results found"));
         }
-
-        for (const folder of this.searchResults[0]){
-          div.appendChild(this.renderFolder(folder));
+        
+        if (this.settings.searchIncludeFolders){
+          for (const folder of this.searchResults[0]){
+            div.appendChild(this.renderFolder(folder));
+          }
         }
 
-        for (const block of this.searchResults[1]){
-          div.appendChild(this.renderBlock(block));
+        if (this.settings.showRaster){
+          for (const block of this.searchResults[1]){
+            div.appendChild(this.renderBlock(block));
+          }
         }
 
-        for (const block of this.searchResults[2]){
-          div.appendChild(this.renderBlock(block));
+        if (this.settings.showVector){
+          for (const block of this.searchResults[2]){
+            div.appendChild(this.renderBlock(block));
+          }
         }
 
       }
@@ -596,7 +617,6 @@ class EllipsisDrive {
           return Promise.all(json);
         })
         .then((ret) => {
-          console.log(ret);
           this.searchResults = [ret[0].result.map(this.fixFolder), 
           ret[1].result.map(this.fixBlock), 
           ret[2].result.map(this.fixBlock)];
@@ -612,12 +632,9 @@ class EllipsisDrive {
       if (str == "") {
         this.searching = false;
         this.activeSearch = false;
-        console.log("no longer searching");
       } else {
         this.searching = true;
         this.activeSearch = true;
-  
-        console.log(`Searching for ${str}`);
   
         this.performSearch(this.searchString);
       }
@@ -635,6 +652,9 @@ class EllipsisDrive {
       search.placeholder = "Search...";
       search.value = this.searchString;
       search.addEventListener("input", this.onSearchChange);
+      search.style.width = "80%";
+      search.style.left = "20px";
+      search.style.position = "relative";
       div.appendChild(search);
       return div;
     }
@@ -648,6 +668,7 @@ class EllipsisDrive {
       } else if (this.authError) {
         this.normalDiv.appendChild(this.authErrorDiv());
       } else {
+        this.searchBarDiv.style.display = "initial";
         if (this.searching) {
           this.normalDiv.appendChild(this.renderSearch());
         } else {
