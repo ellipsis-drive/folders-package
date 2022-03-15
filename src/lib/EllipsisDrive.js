@@ -192,10 +192,19 @@ class EllipsisDrive {
           this.settings.loggedIn = true;
         }
       }
+
+      this.searchBarDiv = this.getSearchBar();
+      this.normalDiv = document.createElement("div");
   
+      this.searchBarDiv.setAttribute("id", "ellipsis-drive-searchbar");
+      this.normalDiv.setAttribute("id", "ellipsis-drive-explorer");
+
       this.settings.div.style.backgroundColor = "#f5f5f5";
       this.settings.div.style.overflow = "scroll";
   
+      this.settings.div.appendChild(this.searchBarDiv);
+      this.settings.div.appendChild(this.normalDiv);
+      
       this.render();
     }
   
@@ -244,8 +253,6 @@ class EllipsisDrive {
   
       return request.json();
     };
-  
-    login = (password) => {};
   
     fixFolder = (inputFolder) => {
       // we might also just return inputFolder but add the 'text' field
@@ -522,31 +529,22 @@ class EllipsisDrive {
         let p = this.p("Loading..");
         div.appendChild(p);
       } else {
-        console.log("else");
         if (this.searchResults[0].length === 0 && 
             this.searchResults[1].length === 0 && 
             this.searchResults[2].length === 0){
           div.appendChild(this.p("No results found"));
         }
-        console.log(this.searchResults);
-        
-        console.log("Folders:");
-        for (const folder of this.searchResults[0]){
 
-          console.log(folder);
+        for (const folder of this.searchResults[0]){
           div.appendChild(this.renderFolder(folder));
         }
 
-        console.log("Maps part 1:");
         for (const block of this.searchResults[1]){
-          console.log(block);
           div.appendChild(this.renderBlock(block));
         }
 
-        console.log("Shapes part 2:");
         for (const block of this.searchResults[2]){
-          console.log(block);
-          div.appendChild(this.fixBlock(block));
+          div.appendChild(this.renderBlock(block));
         }
 
       }
@@ -571,6 +569,7 @@ class EllipsisDrive {
       let params = {
         access: ["public", "subscribed", "owned", "favorited"],
         name: text,
+        canView: true,
       };
   
       let headers = {
@@ -628,6 +627,7 @@ class EllipsisDrive {
     onSearchChange = this.debounce(this.bouncingOnSearchChange, 200);
   
     getSearchBar = () => {
+      let div = document.createElement("div");
       let search = document.createElement("input");
       search.setAttribute("id", "ellipsis-drive-search");
       search.style.marginLeft = `${this.DEPTHCONSTANT}px`
@@ -635,24 +635,23 @@ class EllipsisDrive {
       search.placeholder = "Search...";
       search.value = this.searchString;
       search.addEventListener("input", this.onSearchChange);
-      return search;
+      div.appendChild(search);
+      return div;
     }
 
     render = () => {
-      this.settings.div.innerHTML = "";
+      this.normalDiv.innerHTML = "";
   
       if (!this.settings.loggedIn) {
-        this.settings.div.appendChild(this.loginDiv());
+        this.searchBarDiv.style.display = "none";
+        this.normalDiv.appendChild(this.loginDiv());
       } else if (this.authError) {
-        this.settings.div.appendChild(this.authErrorDiv());
+        this.normalDiv.appendChild(this.authErrorDiv());
       } else {
-        // first add the search bar
-        let search = this.getSearchBar();
-        this.settings.div.appendChild(search);
         if (this.searching) {
-          this.settings.div.appendChild(this.renderSearch());
+          this.normalDiv.appendChild(this.renderSearch());
         } else {
-          this.settings.div.appendChild(this.renderFolder(this.root));
+          this.normalDiv.appendChild(this.renderFolder(this.root));
         }
       }
     };
