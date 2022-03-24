@@ -41,7 +41,7 @@ test.html
         console.log(block);
       };
       let div = document.getElementById("test");
-      let myDrive = new EllipsisDrive({ div: div, callback: cb });
+      let myDrive = new EllipsisDrive({ div: div, cb: cb });
     </script>
   </body>
 </html>
