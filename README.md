@@ -14,11 +14,14 @@ This will be added later.
 
 ### Using the package
 
-Place folders.js in your project directory. Construct an EllipsisDrive object, passing an object as paramater containing two or three variables:
+Place folders.js in your project directory. Construct an EllipsisDrive object, passing an object as paramater containing the following properties:
 
 1. "div", an HTML element where the folder browser should be displayed in.
 2. "cb" (semi-optional), the callback function to be called when a block is clicked. A default callback is provided, but please provide your own.
 3. "token" (optional), the (Ellipsis) api token to be used.
+4. "showRaster" (optional, default true), determines whether raster maps should be displayed.
+5. "showVector" (optional, default true), determines whether vector maps should be displayed.
+6. "searchIncludeFolders" (optional, default true), determines whether search results should include folders or not.
 
 If no token is provided, the user will be prompted to log in. The user will be redirected to Ellipsis Drive, and, after succesfully loging in, will be returned to the current page.
 
