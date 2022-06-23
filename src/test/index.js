@@ -15,6 +15,7 @@ let options = {
     searchIncludeFolders: true,
     showVector: true,
     showRaster: true,
+    allowExpandMaps: true
 }
 
 let myDrive = new EllipsisDrive(options);
