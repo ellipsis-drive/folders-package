@@ -4,6 +4,7 @@ class EllipsisBlock {
     id = undefined;
     layers = undefined;
     showExpanded = false;
+    obj = undefined;
 }
 
 export default EllipsisBlock;
