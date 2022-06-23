@@ -41,7 +41,7 @@ test.html
     <script>
       let cb = (map, layer) => {
         console.log("I am a map!");
-        console.log("I am a map!");
+        console.log(map);
         console.log("I am a layer of this map!");
         console.log(layer);
       };
