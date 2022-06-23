@@ -22,6 +22,7 @@ Place folders.js in your project directory. Construct an EllipsisDrive object, p
 4. "showRaster" (optional, default true), determines whether raster maps should be displayed.
 5. "showVector" (optional, default true), determines whether vector maps should be displayed.
 6. "searchIncludeFolders" (optional, default true), determines whether search results should include folders or not.
+7. "allowExpandMaps" (optional, default true), determines whether maps can be expanded to see their layers. If false, clicking a map calls the callback function with only the map as argument.
 
 If no token is provided, the user will be prompted to log in. The user will be redirected to Ellipsis Drive, and, after succesfully loging in, will be returned to the current page.
 
