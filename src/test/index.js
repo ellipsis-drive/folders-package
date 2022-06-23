@@ -1,9 +1,10 @@
 import { EllipsisDrive } from "../lib";
 
 
-let cb = (block) => {
+let cb = (map, layer) => {
     console.log("I am a callback!");
-    console.log(block);
+    console.log(map);
+    console.log(layer);
 };
 
 let div = document.getElementById("test");

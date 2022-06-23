@@ -170,6 +170,9 @@ class EllipsisDrive {
       blocks: [],
     };
 
+    console.log(this.defaultSettings)
+    console.log(options)
+
     this.settings = { ...this.defaultSettings, ...options };
 
     this.searching = false;
@@ -207,6 +210,9 @@ class EllipsisDrive {
 
     this.settings.div.appendChild(this.searchBarDiv);
     this.settings.div.appendChild(this.normalDiv);
+
+    console.log("TESTTESTTEST");
+    console.log(this.settings);
 
     this.render();
   }
@@ -407,7 +413,7 @@ class EllipsisDrive {
         layerelem.style.marginLeft = "20px";
         layerelem = this.attachMouseEnter(layerelem);
         layerelem.onclick = () => {
-          this.settings.cb(layer);
+          this.settings.cb(block.obj, layer);
         };
 
         div.appendChild(layerelem);
