@@ -149,6 +149,7 @@ class EllipsisDrive {
     showRaster: true,
     showVector: true,
     searchIncludeFolders: true,
+    allowExpandMaps: true,
   };
 
   settings = {};
@@ -380,20 +381,29 @@ class EllipsisDrive {
     elem.style.marginLeft = "20px";
 
     let arrow = block.showExpanded
-      ? this.arrowDown(block.depth)
-      : this.arrowRight(block.depth);
+    ? this.arrowDown(block.depth)
+    : this.arrowRight(block.depth);
+
     let icon =
       block.type == "map"
         ? this.getRasterSVG(block.depth)
         : this.getVectorSVG(block.depth);
 
+    if (this.settings.allowExpandMaps){
     elem = this.attachMouseEnter(elem, [arrow, icon]);
+    } else {
+    elem = this.attachMouseEnter(elem, [icon]);
+    }
 
     arrow.style.float = "left";
 
     let func = () => {
-      block.showExpanded = !block.showExpanded;
-      this.render();
+      if (this.settings.allowExpandMaps){
+        block.showExpanded = !block.showExpanded;
+      } else {
+        this.settings.cb(block.obj, null);
+      }
+        this.render();
     };
 
     elem.onclick = func;
