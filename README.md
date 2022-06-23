@@ -39,9 +39,11 @@ test.html
   <body>
     <div id="test"></div>
     <script>
-      let cb = (block) => {
-        console.log("I am a callback!");
-        console.log(block);
+      let cb = (map, layer) => {
+        console.log("I am a map!");
+        console.log("I am a map!");
+        console.log("I am a layer of this map!");
+        console.log(layer);
       };
       let div = document.getElementById("test");
       let myDrive = new EllipsisDrive({ div: div, cb: cb });
