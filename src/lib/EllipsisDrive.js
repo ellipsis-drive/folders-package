@@ -149,7 +149,7 @@ class EllipsisDrive {
     showRaster: true,
     showVector: true,
     searchIncludeFolders: true,
-    allowExpandMaps: true,
+    allowExpandMaps: false,
   };
 
   settings = {};
@@ -401,7 +401,7 @@ class EllipsisDrive {
       if (this.settings.allowExpandMaps){
         block.showExpanded = !block.showExpanded;
       } else {
-        this.settings.cb(block.obj, null);
+        this.settings.cb(block.obj);
       }
         this.render();
     };
