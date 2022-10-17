@@ -6,7 +6,11 @@ class EllipsisDrive {
   GRAY = "rgba(0, 0, 0, 0.87)";
   SVGGRAY = "rgba(0, 0, 0, 0.54)";
 
-  APIURL = "https://api.ellipsis-drive.com/v1";
+  V1 = "https://api.ellipsis-drive.com/v1";
+  V3 = "https://api.ellipsis-drive.com/v3";
+
+  APIURL = this.V3;
+
 
   DEPTHFACTOR = 30;
   DEPTHCONSTANT = 0;
@@ -242,6 +246,13 @@ class EllipsisDrive {
    */
   getListFolder = async (folder, type = "folder", isRoot = false) => {
     let url = "";
+
+    if (isRoot){
+      url = `${this.APIURL}/account/root/${folder.id}`
+    } else {
+      url = `${this.APIURL}/path/${folder.id}/list`
+    }
+
     url = isRoot
       ? `${this.APIURL}/path/listRoot`
       : `${this.APIURL}/path/listFolder`;
@@ -258,7 +269,7 @@ class EllipsisDrive {
     };
 
     let request = await fetch(url, {
-      method: "POST",
+      method: "GET",
       body: JSON.stringify(params),
       headers: headers,
     });
@@ -414,7 +425,7 @@ class EllipsisDrive {
     div.appendChild(icon);
     div.appendChild(elem);
 
-    if (block.showExpanded) {
+    if (block.showExpanded && block.layers !== undefined) {
       for (const layer of block.layers) {
         if (layer.deleted) {
           continue;
