@@ -401,6 +401,9 @@ class EllipsisDrive {
     arrow.style.float = "left";
 
     let func = () => {
+      this.settings.cb(block.obj);
+      return;
+
       if (this.settings.allowExpandMaps){
         block.showExpanded = !block.showExpanded;
       } else {
