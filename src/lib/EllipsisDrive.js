@@ -79,10 +79,10 @@ class EllipsisDrive {
     svg1.classList.add("ellipsis-folder-icon");
 
     switch (id) {
-      case "myMaps":
+      case "myDrive":
         svg1.innerHTML = `<svg focusable="false" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M11.09 5.37516C10.71 4.99516 10.2 4.78516 9.67 4.78516H4.5C3.4 4.78516 2.51 5.68516 2.51 6.78516L2.5 18.7852C2.5 19.8852 3.4 20.7852 4.5 20.7852H20.5C21.6 20.7852 22.5 19.8852 22.5 18.7852V8.78516C22.5 7.68516 21.6 6.78516 20.5 6.78516H12.5L11.09 5.37516ZM15.502 16.8819C14.7572 16.8818 14.0374 16.6134 13.4745 16.1257C12.9116 15.6381 12.5433 14.9641 12.4372 14.227H15.502V13.3459H12.4372C12.5136 12.8141 12.727 12.3113 13.0566 11.8869C13.3862 11.4626 13.8205 11.1313 14.317 10.9256C14.8135 10.7199 15.355 10.6469 15.8882 10.7138C16.4214 10.7807 16.9281 10.9852 17.3583 11.3072L18.0025 10.6632C17.4141 10.192 16.7045 9.89662 15.9555 9.81103C15.2065 9.72545 14.4485 9.85315 13.769 10.1794C13.0894 10.5057 12.5158 11.0173 12.1144 11.6552C11.713 12.2932 11.5 13.0315 11.5 13.7852C11.5 14.5388 11.713 15.2772 12.1144 15.9151C12.5158 16.553 13.0894 17.0646 13.769 17.3909C14.4485 17.7172 15.2065 17.8449 15.9555 17.7593C16.7045 17.6737 17.4141 17.3783 18.0025 16.9071L17.3583 16.2632C16.8232 16.6655 16.1716 16.8827 15.502 16.8819ZM17.9847 15.6338C18.3836 15.1005 18.5989 14.4524 18.5983 13.7865C18.5996 13.1212 18.3854 12.4735 17.9878 11.9401C17.9861 11.9379 17.9852 11.9353 17.9852 11.9325C17.9852 11.9298 17.9861 11.9271 17.9878 11.925L18.6125 11.2983C18.6136 11.297 18.615 11.2961 18.6165 11.2954C18.618 11.2947 18.6197 11.2944 18.6214 11.2944C18.623 11.2944 18.6247 11.2947 18.6262 11.2954C18.6277 11.2961 18.6291 11.297 18.6302 11.2983C19.1934 12.0058 19.5 12.8832 19.5 13.7874C19.5 14.6915 19.1934 15.569 18.6302 16.2764C18.6291 16.2777 18.6277 16.2787 18.6262 16.2794C18.6247 16.28 18.623 16.2804 18.6214 16.2804C18.6197 16.2804 18.618 16.28 18.6165 16.2794C18.615 16.2787 18.6136 16.2777 18.6125 16.2764L17.9847 15.6489C17.983 15.6467 17.9821 15.6441 17.9821 15.6413C17.9821 15.6386 17.983 15.6359 17.9847 15.6338Z"></path></svg>`;
         break;
-      case "shared":
+      case "sharedWithMe":
         svg1.innerHTML = `<svg focusable="false" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-5 3c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm4 8h-8v-1c0-1.33 2.67-2 4-2s4 .67 4 2v1z"></path></svg>`;
         break;
       case "favorites":
@@ -168,8 +168,8 @@ class EllipsisDrive {
       showExpanded: true,
       foldersExpanded: true,
       folders: [
-        new EllipsisFolder("My Drive", "myMaps", "myMaps", 0, true),
-        new EllipsisFolder("Shared with me", "shared", "shared", 0, true),
+        new EllipsisFolder("My Drive", "myDrive", "myDrive", 0, true),
+        new EllipsisFolder("Shared with me", "sharedWithMe", "sharedWithMe", 0, true),
         new EllipsisFolder("Favorites", "favorites", "favorites", 0, true),
       ],
       blocks: [],
@@ -216,9 +216,6 @@ class EllipsisDrive {
     this.settings.div.appendChild(this.searchBarDiv);
     this.settings.div.appendChild(this.normalDiv);
 
-    console.log("TESTTESTTEST");
-    console.log(this.settings);
-
     this.render();
   }
 
@@ -244,33 +241,27 @@ class EllipsisDrive {
    * @param {EllipsisFolder}
    * @param {string} either "folder" or "map"
    */
-  getListFolder = async (folder, type = "folder", isRoot = false) => {
+  getListFolder = async (folder, isFolder, isRoot = false) => {
     let url = "";
-
+    let headers = {};
+    let params = {};
+    console.log(folder);
     if (isRoot){
-      url = `${this.APIURL}/account/root/${folder.id}`
+      url = `${this.APIURL}/account/root/${folder.id}?&isFolder=${isFolder}`
     } else {
-      url = `${this.APIURL}/path/${folder.id}/list`
+      url = `${this.APIURL}/path/${folder.id}/list?isFolder=${isFolder}`
     }
 
-    url = isRoot
-      ? `${this.APIURL}/path/listRoot`
-      : `${this.APIURL}/path/listFolder`;
-
-    let params = {
-      root: folder.id,
-      pathId: folder.id,
-      type: type,
-    };
-
-    let headers = {
+    headers = {
       "Content-Type": "application/json",
       Authorization: `Bearer ${this.settings.token}`,
     };
 
+    console.log(url);
+    console.log(headers);
+
     let request = await fetch(url, {
       method: "GET",
-      body: JSON.stringify(params),
       headers: headers,
     });
 
@@ -304,8 +295,8 @@ class EllipsisDrive {
   expandFolder = (folder) => {
     folder.foldersExpanded = true;
     let isRoot = folder.root;
-    let folders = this.getListFolder(folder, "folder", isRoot);
-    let blocks = this.getListFolder(folder, "map", isRoot);
+    let folders = this.getListFolder(folder, true, isRoot);
+    let blocks = this.getListFolder(folder, false, isRoot);
     Promise.all([folders, blocks]).then((values) => {
       if (!("result" in values[0])) {
         console.warn(
