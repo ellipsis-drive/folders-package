@@ -298,6 +298,7 @@ class EllipsisDrive {
     let folders = this.getListFolder(folder, true, isRoot);
     let blocks = this.getListFolder(folder, false, isRoot);
     Promise.all([folders, blocks]).then((values) => {
+      console.log(values);
       if (!("result" in values[0])) {
         console.warn(
           "EllipsisDrive: Authentication error, your token might be invalid"
@@ -371,11 +372,11 @@ class EllipsisDrive {
   renderBlock = (block) => {
     let div = document.createElement("div");
 
-    if (block.type == "map" && !this.settings.showRaster) {
+    if (block.type == "raster" && !this.settings.showRaster) {
       div.style.display = "none";
     }
 
-    if (block.type == "shape" && !this.settings.showVector) {
+    if (block.type == "vector" && !this.settings.showVector) {
       div.style.display = "none";
     }
 
@@ -387,7 +388,7 @@ class EllipsisDrive {
     : this.arrowRight(block.depth);
 
     let icon =
-      block.type == "map"
+      block.type == "raster"
         ? this.getRasterSVG(block.depth)
         : this.getVectorSVG(block.depth);
 
