@@ -154,6 +154,7 @@ class EllipsisDrive {
     showVector: true,
     searchIncludeFolders: true,
     allowExpandMaps: true,
+    preloadRoots: true,
   };
 
   settings = {};
@@ -215,6 +216,12 @@ class EllipsisDrive {
 
     this.settings.div.appendChild(this.searchBarDiv);
     this.settings.div.appendChild(this.normalDiv);
+
+    if (this.settings.preloadRoots){
+      for (const folder of this.root.folders){
+        this.expandFolder(folder);
+      }
+    }
 
     this.render();
   }
