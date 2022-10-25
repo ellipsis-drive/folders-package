@@ -154,7 +154,7 @@ class EllipsisDrive {
     showVector: true,
     searchIncludeFolders: true,
     allowExpandMaps: true,
-    preloadRoots: true,
+    preloadRoots: false,
   };
 
   settings = {};
@@ -218,6 +218,7 @@ class EllipsisDrive {
     this.settings.div.appendChild(this.normalDiv);
 
     if (this.settings.preloadRoots){
+      // experimental feature, already load in the first 'layer' in the file structure so there is not loading time there
       for (const folder of this.root.folders){
         this.expandFolder(folder);
       }
@@ -625,19 +626,15 @@ class EllipsisDrive {
       apiurlfolders = f"/account/folders"
       */
 
-    let urlmaps = `${this.APIURL}/account/maps`;
-    let urlshapes = `${this.APIURL}/account/shapes`;
-    let urlfolders = `${this.APIURL}/account/folders`;
+    let apiurl = `${this.APIURL}/path`
 
-    let urls = [urlfolders, urlmaps, urlshapes];
+    let folderurl = `${apiurl}?type=["folder"]&name=${text}`;
+    let vectorurl = `${apiurl}?type=["vector"]&name=${text}`;
+    let rasterurl = `${apiurl}?type=["raster"]&name=${text}`;
+
+    let urls = [folderurl, vectorurl, rasterurl];
 
     let requests = [];
-
-    let params = {
-      access: ["public", "subscribed", "owned", "favorited"],
-      name: text,
-      canView: true,
-    };
 
     let headers = {
       "Content-Type": "application/json",
@@ -647,8 +644,7 @@ class EllipsisDrive {
     for (const url of urls) {
       requests.push(
         fetch(url, {
-          method: "POST",
-          body: JSON.stringify(params),
+          method: "GET",
           headers: headers,
         })
       );
