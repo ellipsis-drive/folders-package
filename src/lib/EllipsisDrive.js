@@ -176,9 +176,6 @@ class EllipsisDrive {
       blocks: [],
     };
 
-    console.log(this.defaultSettings)
-    console.log(options)
-
     this.settings = { ...this.defaultSettings, ...options };
 
     this.searching = false;
@@ -252,8 +249,7 @@ class EllipsisDrive {
   getListFolder = async (folder, isFolder, isRoot = false) => {
     let url = "";
     let headers = {};
-    let params = {};
-    console.log(folder);
+
     if (isRoot){
       url = `${this.APIURL}/account/root/${folder.id}?&isFolder=${isFolder}`
     } else {
@@ -264,9 +260,6 @@ class EllipsisDrive {
       "Content-Type": "application/json",
       Authorization: `Bearer ${this.settings.token}`,
     };
-
-    console.log(url);
-    console.log(headers);
 
     let request = await fetch(url, {
       method: "GET",
@@ -306,7 +299,6 @@ class EllipsisDrive {
     let folders = this.getListFolder(folder, true, isRoot);
     let blocks = this.getListFolder(folder, false, isRoot);
     Promise.all([folders, blocks]).then((values) => {
-      console.log(values);
       if (!("result" in values[0])) {
         console.warn(
           "EllipsisDrive: Authentication error, your token might be invalid"
@@ -620,11 +612,6 @@ class EllipsisDrive {
   };
 
   performSearch = async (text) => {
-    /*
-      apiurlmaps = f"/account/maps"
-      apiurlshapes = f"/account/shapes"
-      apiurlfolders = f"/account/folders"
-      */
 
     let apiurl = `${this.APIURL}/path`
 
