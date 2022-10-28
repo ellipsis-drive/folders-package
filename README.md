@@ -40,10 +40,8 @@ test.html
   <body>
     <div id="test"></div>
     <script>
-      let cb = (map, layer) => {
-        console.log("I am a map!");
-        console.log(map);
-        console.log("I am a layer of this map!");
+      let cb = (layer) => {
+        console.log("Clicked on layer:");
         console.log(layer);
       };
       let div = document.getElementById("test");

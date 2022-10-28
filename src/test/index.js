@@ -1,9 +1,8 @@
 import { EllipsisDrive } from "../lib";
 
 
-let cb = (map, layer) => {
-    console.log("I am a callback!");
-    console.log(map);
+let cb = (layer) => {
+    console.log("Clicked on layer:");
     console.log(layer);
 };
 
