@@ -103,7 +103,7 @@ class EllipsisDrive {
     div.style.alignItems = "center";
     div.style.display = "flex";
     div.style.float = "left";
-    div.style.marginLeft = "10px";
+    div.style.marginLeft = `${this.DEPTHFACTOR * (depth-1) + 57}px`;
 
     const svg1 = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     svg1.style.height = "15px";
@@ -124,7 +124,7 @@ class EllipsisDrive {
     div.style.alignItems = "center";
     div.style.display = "flex";
     div.style.float = "left";
-    div.style.marginLeft = "10px";
+    div.style.marginLeft = `${this.DEPTHFACTOR * (depth-1) + 57}px`;
 
     const svg1 = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     svg1.style.height = "15px";
@@ -153,7 +153,6 @@ class EllipsisDrive {
     showRaster: true,
     showVector: true,
     searchIncludeFolders: true,
-    allowExpandMaps: true,
     preloadRoots: false,
   };
 
@@ -383,40 +382,21 @@ class EllipsisDrive {
     let elem = this.p(`${block.name}`, block.depth);
     elem.style.marginLeft = "20px";
 
-    let arrow = block.showExpanded
-    ? this.arrowDown(block.depth)
-    : this.arrowRight(block.depth);
-
     let icon =
       block.type == "raster"
         ? this.getRasterSVG(block.depth)
         : this.getVectorSVG(block.depth);
 
-    if (this.settings.allowExpandMaps){
-    elem = this.attachMouseEnter(elem, [arrow, icon]);
-    } else {
-    elem = this.attachMouseEnter(elem, [icon]);
-    }
 
-    arrow.style.float = "left";
+    elem = this.attachMouseEnter(elem, [icon]);
 
     let func = () => {
       this.settings.cb(block.obj);
-      return;
-
-      if (this.settings.allowExpandMaps){
-        block.showExpanded = !block.showExpanded;
-      } else {
-        this.settings.cb(block.obj);
-      }
-        this.render();
     };
 
     elem.onclick = func;
     icon.onclick = func;
-    arrow.onclick = func;
 
-    div.appendChild(arrow);
     div.appendChild(icon);
     div.appendChild(elem);
 
