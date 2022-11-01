@@ -368,7 +368,11 @@ class EllipsisDrive {
     return elem;
   };
 
-  renderBlock = (block) => {
+  renderBlock = (block, search=false) => {
+    if (search){
+      block.depth = 0;
+    }
+    
     let div = document.createElement("div");
 
     if (block.type == "raster" && !this.settings.showRaster) {
@@ -573,14 +577,14 @@ class EllipsisDrive {
       if (this.settings.showRaster) {
         for (const block of this.searchResults[1]) {
           anything = true;
-          div.appendChild(this.renderBlock(block));
+          div.appendChild(this.renderBlock(block, true));
         }
       }
 
       if (this.settings.showVector) {
         for (const block of this.searchResults[2]) {
           anything = true;
-          div.appendChild(this.renderBlock(block));
+          div.appendChild(this.renderBlock(block, true));
         }
       }
 
