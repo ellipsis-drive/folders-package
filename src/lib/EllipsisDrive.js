@@ -14,7 +14,7 @@ class EllipsisDrive {
 
 
   isValidTimestamp = (t) => {
-    if (t.status !== 'finished') {
+    if (t.status !== 'active') {
       return { available: false, reason: 'Timestamp not active' };
     } else if (t.availability.blocked) {
       return { available: false, reason: t.availability.reason };
@@ -358,7 +358,7 @@ class EllipsisDrive {
     });
   };
 
-  attachMouseEnter = (elem, extra, refresh) => {
+  attachMouseEnter = (elem, extra, refresh, p2=null) => {
     elem.style.color = this.GRAY;
     if (!extra) {
       extra = [];
@@ -377,6 +377,7 @@ class EllipsisDrive {
         }
 
         elem.style.color = color;
+        if (p2) p2.style.color = color;
 
         if (refresh != null) {
           refresh.style.color = svgcolor;
@@ -391,6 +392,8 @@ class EllipsisDrive {
 
     elem.onmouseenter = turnColor(this.BLUE, this.BLUE, true);
     elem.onmouseleave = turnColor(this.GRAY, this.SVGGRAY, false);
+    if (p2) p2.onmouseenter = turnColor(this.BLUE, this.BLUE, true);
+    if (p2) p2.onmouseleave = turnColor(this.GRAY, this.SVGGRAY, false);
 
     if (refresh != null && false) {
       refresh.onmouseenter = () => {
@@ -410,6 +413,13 @@ class EllipsisDrive {
   };
 
   renderBlock = (block, search=false) => {
+
+    // if it isnt available, we show the reason beneath
+    // we gray it out and make it unclickable
+    
+    // if it is available, we show the type beneath
+    // it is clickable and normal
+
     if (search){
       block.depth = 0;
     }
@@ -426,33 +436,46 @@ class EllipsisDrive {
       div.style.display = "none";
     }
 
-    let elem = undefined;
+    let p1 = this.p(`${block.name}`, block.depth);
+    let p2 = undefined;
+
     if (available){
-      elem = this.p(`${block.name}`, block.depth);
+      p2 = this.p(`${block.type}`, block.depth);
     }
-    else {
-      elem = this.p(`${block.name} (${block.availability.reason})`, block.depth);
+    else 
+    {
+      p1.style.color = "gray";
+      p2 = this.p(`${block.availability.reason}`, block.depth);
     }
 
-    elem.style.marginLeft = "20px";
+    p2.style.color = "gray";
+    p2.style.marginLeft = "20px";
+    p2.style.marginTop = "-15px";
+    p1.style.marginLeft = "20px";
 
     let icon =
       block.type == "raster"
         ? this.getRasterSVG(block.depth)
         : this.getVectorSVG(block.depth);
+
     
     let func = () => {
       this.settings.cb(block.obj);
     };
 
-    if (available || true){
-      elem = this.attachMouseEnter(elem, [icon]);
-      elem.onclick = func;
+    if (available){
+      p1 = this.attachMouseEnter(p1, [icon], null, p2);
+      p1.onclick = func;
       icon.onclick = func;
+    } else {
+      icon.style.backgroundColor = this.SVGGRAY;
     }
 
+    icon.style.marginTop = "8px";
+
     div.appendChild(icon);
-    div.appendChild(elem);
+    div.appendChild(p1);
+    div.appendChild(p2);
 
     return div;
   };
