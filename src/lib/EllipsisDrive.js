@@ -6,14 +6,57 @@ class EllipsisDrive {
   GRAY = "rgba(0, 0, 0, 0.87)";
   SVGGRAY = "rgba(0, 0, 0, 0.54)";
 
-  V1 = "https://api.ellipsis-drive.com/v1";
-  V3 = "https://api.ellipsis-drive.com/v3";
-
-  APIURL = this.V3;
+  APIURL = "https://api.ellipsis-drive.com/v3";
 
 
   DEPTHFACTOR = 30;
   DEPTHCONSTANT = 0;
+
+
+  isValidTimestamp = (t) => {
+    if (t.status !== 'finished') {
+      return { available: false, reason: 'Timestamp not active' };
+    } else if (t.availability.blocked) {
+      return { available: false, reason: t.availability.reason };
+    }
+    return { available: true };
+  };
+  
+  isValidMap = (m) => {
+    if (!m) {
+      return { available: false, reason: 'No Layer' };
+    }
+    if (m.type !== 'raster' && m.type !== 'vector') {
+      return { available: true };
+    }
+    if (m.disabled) {
+      return { available: false, reason: 'Layer disabled' };
+    }
+    if (m.deleted) {
+      return { available: false, reason: 'Layer trashed' };
+    }
+    if (m.yourAccess.accessLevel === 0) {
+      return { available: false, reason: 'No access' };
+    }
+    if (m[m.type].timestamps.filter((t) => this.isValidTimestamp(t, m).available).length === 0) {
+      if (m[m.type].timestamps.find((t) => t.availability?.reason === 'relocation')) {
+        return { available: false, reason: 'Relocating layer' };
+      } else if (m[m.type].timestamps.find((t) => t.availability?.reason === 'reindexing')) {
+        return { available: false, reason: 'Reindexing layer' };
+      } else if (m.type === 'raster' && m[m.type].timestamps.filter((t) => t.uploads.completed > 0).length === 0) {
+        return { available: false, reason: 'No uploads' };
+      } else if (m[m.type].timestamps.find((t) => t.status === 'activating')) {
+        return { available: false, reason: 'Activating files' };
+      } else if (m[m.type].timestamps.find((t) => t.status === 'pausing')) {
+        return { available: false, reason: 'Pausing files' };
+      } else if (m[m.type].timestamps.find((t) => t.status === 'created')) {
+        return { available: false, reason: 'No active timestamps' };
+      } else {
+        return { available: false, reason: 'No timestamps' };
+      }
+    }
+    return { available: true };
+  };
 
   debounce = (func, timeout = 300) => {
     let timer;
@@ -284,11 +327,9 @@ class EllipsisDrive {
     block.id = inputBlock.id;
     block.name = inputBlock.name;
     block.obj = inputBlock;
-    if (block.type == "map") {
-      block.layers = inputBlock.mapLayers;
-    } else {
-      block.layers = inputBlock.geometryLayers; //check
-    }
+
+    block.availability = this.isValidMap(inputBlock);
+
     return block;
   };
 
@@ -372,6 +413,8 @@ class EllipsisDrive {
     if (search){
       block.depth = 0;
     }
+
+    let available = block.availability.available;
     
     let div = document.createElement("div");
 
@@ -383,42 +426,33 @@ class EllipsisDrive {
       div.style.display = "none";
     }
 
-    let elem = this.p(`${block.name}`, block.depth);
+    let elem = undefined;
+    if (available){
+      elem = this.p(`${block.name}`, block.depth);
+    }
+    else {
+      elem = this.p(`${block.name} (${block.availability.reason})`, block.depth);
+    }
+
     elem.style.marginLeft = "20px";
 
     let icon =
       block.type == "raster"
         ? this.getRasterSVG(block.depth)
         : this.getVectorSVG(block.depth);
-
-
-    elem = this.attachMouseEnter(elem, [icon]);
-
+    
     let func = () => {
       this.settings.cb(block.obj);
     };
 
-    elem.onclick = func;
-    icon.onclick = func;
+    if (available || true){
+      elem = this.attachMouseEnter(elem, [icon]);
+      elem.onclick = func;
+      icon.onclick = func;
+    }
 
     div.appendChild(icon);
     div.appendChild(elem);
-
-    if (block.showExpanded && block.layers !== undefined) {
-      for (const layer of block.layers) {
-        if (layer.deleted) {
-          continue;
-        }
-        let layerelem = this.p(layer.name, block.depth);
-        layerelem.style.marginLeft = "20px";
-        layerelem = this.attachMouseEnter(layerelem);
-        layerelem.onclick = () => {
-          this.settings.cb(block.obj, layer);
-        };
-
-        div.appendChild(layerelem);
-      }
-    }
 
     return div;
   };
