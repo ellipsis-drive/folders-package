@@ -281,6 +281,7 @@ class EllipsisDrive {
     }px`;
     elem.classList.add("ellipsis-folder-p");
     elem.style.fontFamily = `"Roboto Condensed","Roboto","Helvetica","Lucida Sans Unicode","sans-serif"`;
+    elem.style.cursor = "default";
     return elem;
   };
 
@@ -358,13 +359,15 @@ class EllipsisDrive {
     });
   };
 
-  attachMouseEnter = (elem, extra, refresh, p2=null) => {
+  
+  attachMouseEnter = (elem, extra, refresh, p2=null, div=null) => {
     elem.style.color = this.GRAY;
     if (!extra) {
       extra = [];
     }
 
     elem.style.cursor = "pointer";
+    if (p2) p2.style.cursor = "pointer";
 
     let turnColor = (color, svgcolor, onEnter) => {
       let func = () => {
@@ -390,24 +393,10 @@ class EllipsisDrive {
       return func;
     };
 
-    elem.onmouseenter = turnColor(this.BLUE, this.BLUE, true);
-    elem.onmouseleave = turnColor(this.GRAY, this.SVGGRAY, false);
-    if (p2) p2.onmouseenter = turnColor(this.BLUE, this.BLUE, true);
-    if (p2) p2.onmouseleave = turnColor(this.GRAY, this.SVGGRAY, false);
-
-    if (refresh != null && false) {
-      refresh.onmouseenter = () => {
-        refresh.style.fill = this.BLUE;
-      };
-      refresh.onmouseleave = () => {
-        refresh.style.fill = this.SVGGRAY;
-      };
-    }
-
-    for (const extr of extra) {
-      extr.onmouseenter = turnColor(this.BLUE, this.BLUE, true);
-      extr.onmouseleave = turnColor(this.GRAY, this.SVGGRAY, false);
-    }
+    if (div) div.onmouseenter = turnColor(this.BLUE, this.BLUE, true);
+    if (div) div.onmouseleave = turnColor(this.GRAY, this.SVGGRAY, false);
+    //if (p2) p2.onmouseenter = turnColor(this.BLUE, this.BLUE, true);
+    //if (p2) p2.onmouseleave = turnColor(this.GRAY, this.SVGGRAY, false);
 
     return elem;
   };
@@ -458,7 +447,7 @@ class EllipsisDrive {
     };
 
     if (available){
-      p1 = this.attachMouseEnter(p1, [icon], null, p2);
+      p1 = this.attachMouseEnter(p1, [icon], null, p2, div);
       p1.onclick = func;
       icon.onclick = func;
     } else {
@@ -502,6 +491,7 @@ class EllipsisDrive {
 
       let refresh = this.refreshSVG();
       refresh.onclick = () => {
+        console.log("refreshing");
         folder.showExpanded = !folder.showExpanded;
         folder.foldersExpanded = false;
         folder.folders = [];
@@ -512,7 +502,7 @@ class EllipsisDrive {
       toBeAdded = this.attachMouseEnter(
         toBeAdded,
         [arrow, foldericon],
-        refresh
+        refresh, null, startdiv
       );
 
       refresh.style.float = "right";
