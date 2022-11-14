@@ -409,11 +409,7 @@ class EllipsisDrive {
     
     let div = document.createElement("div");
 
-    if (block.type == "raster" && !this.settings.showRaster) {
-      div.style.display = "none";
-    }
-
-    if (block.type == "vector" && !this.settings.showVector) {
+    if ((block.type == "raster" && !this.settings.showRaster) || (block.type == "vector" && !this.settings.showVector)) {
       div.style.display = "none";
     }
 
@@ -447,7 +443,6 @@ class EllipsisDrive {
     if (available){
       this.attachMouseEnter(div, [p1,p2], [icon], null);
       div.onclick = func;
-      //icon.onclick = func;
     } else {
       icon.style.backgroundColor = this.SVGGRAY;
     }
@@ -475,9 +470,6 @@ class EllipsisDrive {
     div.appendChild(startdiv);
     div.appendChild(enddiv);
 
-    // don't display the 'root' name
-    // and don't attach an onclick listener
-
     if (!folder.trueRoot) {
       startdiv.onclick = (input) => this.onClick(folder, input);
       let toBeAdded = this.p(`${folder.text}`, folder.depth);
@@ -489,7 +481,6 @@ class EllipsisDrive {
 
       let refresh = this.refreshSVG();
       refresh.onclick = () => {
-        console.log("refreshing");
         folder.showExpanded = !folder.showExpanded;
         folder.foldersExpanded = false;
         folder.folders = [];
