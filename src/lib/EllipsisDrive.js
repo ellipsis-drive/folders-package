@@ -360,14 +360,15 @@ class EllipsisDrive {
   };
 
   
-  attachMouseEnter = (elem, extra, refresh, p2=null, div=null) => {
-    elem.style.color = this.GRAY;
-    if (!extra) {
-      extra = [];
+  attachMouseEnter = (div, elems, svgs, refresh) => {
+    for (const elem of elems){
+      elem.style.color = this.GRAY;
+      elem.style.cursor = "pointer";
     }
 
-    elem.style.cursor = "pointer";
-    if (p2) p2.style.cursor = "pointer";
+    if (!svgs) {
+      svgs = [];
+    }
 
     let turnColor = (color, svgcolor, onEnter) => {
       let func = () => {
@@ -379,15 +380,16 @@ class EllipsisDrive {
           }
         }
 
-        elem.style.color = color;
-        if (p2) p2.style.color = color;
+        for (const elem of elems){
+          elem.style.color = color;
+        }
 
         if (refresh != null) {
           refresh.style.color = svgcolor;
         }
 
-        for (const extr of extra) {
-          extr.style.fill = svgcolor;
+        for (const svg of svgs) {
+          svg.style.fill = svgcolor;
         }
       };
       return func;
@@ -395,10 +397,6 @@ class EllipsisDrive {
 
     if (div) div.onmouseenter = turnColor(this.BLUE, this.BLUE, true);
     if (div) div.onmouseleave = turnColor(this.GRAY, this.SVGGRAY, false);
-    //if (p2) p2.onmouseenter = turnColor(this.BLUE, this.BLUE, true);
-    //if (p2) p2.onmouseleave = turnColor(this.GRAY, this.SVGGRAY, false);
-
-    return elem;
   };
 
   renderBlock = (block, search=false) => {
@@ -447,9 +445,9 @@ class EllipsisDrive {
     };
 
     if (available){
-      p1 = this.attachMouseEnter(p1, [icon], null, p2, div);
-      p1.onclick = func;
-      icon.onclick = func;
+      this.attachMouseEnter(div, [p1,p2], [icon], null);
+      div.onclick = func;
+      //icon.onclick = func;
     } else {
       icon.style.backgroundColor = this.SVGGRAY;
     }
@@ -499,11 +497,7 @@ class EllipsisDrive {
       };
 
       let foldericon = this.getFolderSVG(folder.id);
-      toBeAdded = this.attachMouseEnter(
-        toBeAdded,
-        [arrow, foldericon],
-        refresh, null, startdiv
-      );
+      this.attachMouseEnter(startdiv, [toBeAdded], [arrow, foldericon], refresh);
 
       refresh.style.float = "right";
       refresh.style.position = "relative";
