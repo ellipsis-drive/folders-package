@@ -414,12 +414,6 @@ class EllipsisDrive {
 
   renderBlock = (block, search=false) => {
 
-    // if it isnt available, we show the reason beneath
-    // we gray it out and make it unclickable
-    
-    // if it is available, we show the type beneath
-    // it is clickable and normal
-
     if (search){
       block.depth = 0;
     }
