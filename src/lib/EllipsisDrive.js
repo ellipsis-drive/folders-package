@@ -8,51 +8,63 @@ class EllipsisDrive {
 
   APIURL = "https://api.ellipsis-drive.com/v3";
 
-
   DEPTHFACTOR = 30;
   DEPTHCONSTANT = 0;
 
-
   isValidTimestamp = (t) => {
-    if (t.status !== 'active') {
-      return { available: false, reason: 'Timestamp not active' };
+    if (t.status !== "active") {
+      return { available: false, reason: "Timestamp not active" };
     } else if (t.availability.blocked) {
       return { available: false, reason: t.availability.reason };
     }
     return { available: true };
   };
-  
+
   isValidMap = (m) => {
     if (!m) {
-      return { available: false, reason: 'No Layer' };
+      return { available: false, reason: "No Layer" };
     }
-    if (m.type !== 'raster' && m.type !== 'vector') {
+    if (m.type !== "raster" && m.type !== "vector") {
       return { available: true };
     }
     if (m.disabled) {
-      return { available: false, reason: 'Layer disabled' };
+      return { available: false, reason: "Layer disabled" };
     }
     if (m.deleted) {
-      return { available: false, reason: 'Layer trashed' };
+      return { available: false, reason: "Layer trashed" };
     }
     if (m.yourAccess.accessLevel === 0) {
-      return { available: false, reason: 'No access' };
+      return { available: false, reason: "No access" };
     }
-    if (m[m.type].timestamps.filter((t) => this.isValidTimestamp(t, m).available).length === 0) {
-      if (m[m.type].timestamps.find((t) => t.availability?.reason === 'relocation')) {
-        return { available: false, reason: 'Relocating layer' };
-      } else if (m[m.type].timestamps.find((t) => t.availability?.reason === 'reindexing')) {
-        return { available: false, reason: 'Reindexing layer' };
-      } else if (m.type === 'raster' && m[m.type].timestamps.filter((t) => t.uploads.completed > 0).length === 0) {
-        return { available: false, reason: 'No uploads' };
-      } else if (m[m.type].timestamps.find((t) => t.status === 'activating')) {
-        return { available: false, reason: 'Activating files' };
-      } else if (m[m.type].timestamps.find((t) => t.status === 'pausing')) {
-        return { available: false, reason: 'Pausing files' };
-      } else if (m[m.type].timestamps.find((t) => t.status === 'created')) {
-        return { available: false, reason: 'No active timestamps' };
+    if (
+      m[m.type].timestamps.filter((t) => this.isValidTimestamp(t, m).available)
+        .length === 0
+    ) {
+      if (
+        m[m.type].timestamps.find(
+          (t) => t.availability?.reason === "relocation"
+        )
+      ) {
+        return { available: false, reason: "Relocating layer" };
+      } else if (
+        m[m.type].timestamps.find(
+          (t) => t.availability?.reason === "reindexing"
+        )
+      ) {
+        return { available: false, reason: "Reindexing layer" };
+      } else if (
+        m.type === "raster" &&
+        m[m.type].timestamps.filter((t) => t.uploads.completed > 0).length === 0
+      ) {
+        return { available: false, reason: "No uploads" };
+      } else if (m[m.type].timestamps.find((t) => t.status === "activating")) {
+        return { available: false, reason: "Activating files" };
+      } else if (m[m.type].timestamps.find((t) => t.status === "pausing")) {
+        return { available: false, reason: "Pausing files" };
+      } else if (m[m.type].timestamps.find((t) => t.status === "created")) {
+        return { available: false, reason: "No active timestamps" };
       } else {
-        return { available: false, reason: 'No timestamps' };
+        return { available: false, reason: "No timestamps" };
       }
     }
     return { available: true };
@@ -146,7 +158,7 @@ class EllipsisDrive {
     div.style.alignItems = "center";
     div.style.display = "flex";
     div.style.float = "left";
-    div.style.marginLeft = `${this.DEPTHFACTOR * (depth-1) + 57}px`;
+    div.style.marginLeft = `${this.DEPTHFACTOR * (depth - 1) + 57}px`;
 
     const svg1 = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     svg1.style.height = "15px";
@@ -167,7 +179,7 @@ class EllipsisDrive {
     div.style.alignItems = "center";
     div.style.display = "flex";
     div.style.float = "left";
-    div.style.marginLeft = `${this.DEPTHFACTOR * (depth-1) + 57}px`;
+    div.style.marginLeft = `${this.DEPTHFACTOR * (depth - 1) + 57}px`;
 
     const svg1 = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     svg1.style.height = "15px";
@@ -192,6 +204,9 @@ class EllipsisDrive {
       );
     },
     icon: "default",
+    onLogInClick: () => {
+      window.location = `https://app.ellipsis-drive.com/login?referer=${window.location.href}`;
+    },
     div: null,
     showRaster: true,
     showVector: true,
@@ -212,7 +227,13 @@ class EllipsisDrive {
       foldersExpanded: true,
       folders: [
         new EllipsisFolder("My Drive", "myDrive", "myDrive", 0, true),
-        new EllipsisFolder("Shared with me", "sharedWithMe", "sharedWithMe", 0, true),
+        new EllipsisFolder(
+          "Shared with me",
+          "sharedWithMe",
+          "sharedWithMe",
+          0,
+          true
+        ),
         new EllipsisFolder("Favorites", "favorites", "favorites", 0, true),
       ],
       blocks: [],
@@ -256,9 +277,9 @@ class EllipsisDrive {
     this.settings.div.appendChild(this.searchBarDiv);
     this.settings.div.appendChild(this.normalDiv);
 
-    if (this.settings.preloadRoots){
+    if (this.settings.preloadRoots) {
       // experimental feature, already load in the first 'layer' in the file structure so there is not loading time there
-      for (const folder of this.root.folders){
+      for (const folder of this.root.folders) {
         this.expandFolder(folder);
       }
     }
@@ -293,10 +314,10 @@ class EllipsisDrive {
     let url = "";
     let headers = {};
 
-    if (isRoot){
-      url = `${this.APIURL}/account/root/${folder.id}?&isFolder=${isFolder}`
+    if (isRoot) {
+      url = `${this.APIURL}/account/root/${folder.id}?&isFolder=${isFolder}`;
     } else {
-      url = `${this.APIURL}/path/${folder.id}/list?isFolder=${isFolder}`
+      url = `${this.APIURL}/path/${folder.id}/list?isFolder=${isFolder}`;
     }
 
     headers = {
@@ -359,9 +380,8 @@ class EllipsisDrive {
     });
   };
 
-  
   attachMouseEnter = (div, elems, svgs, refresh) => {
-    for (const elem of elems){
+    for (const elem of elems) {
       elem.style.color = this.GRAY;
       elem.style.cursor = "pointer";
     }
@@ -380,7 +400,7 @@ class EllipsisDrive {
           }
         }
 
-        for (const elem of elems){
+        for (const elem of elems) {
           elem.style.color = color;
         }
 
@@ -399,28 +419,28 @@ class EllipsisDrive {
     if (div) div.onmouseleave = turnColor(this.GRAY, this.SVGGRAY, false);
   };
 
-  renderBlock = (block, search=false) => {
-
-    if (search){
+  renderBlock = (block, search = false) => {
+    if (search) {
       block.depth = 0;
     }
 
     let available = block.availability.available;
-    
+
     let div = document.createElement("div");
 
-    if ((block.type == "raster" && !this.settings.showRaster) || (block.type == "vector" && !this.settings.showVector)) {
+    if (
+      (block.type == "raster" && !this.settings.showRaster) ||
+      (block.type == "vector" && !this.settings.showVector)
+    ) {
       div.style.display = "none";
     }
 
     let p1 = this.p(`${block.name}`, block.depth);
     let p2 = undefined;
 
-    if (available){
+    if (available) {
       p2 = this.p(`${block.type}`, block.depth);
-    }
-    else 
-    {
+    } else {
       p1.style.color = "gray";
       p2 = this.p(`${block.availability.reason}`, block.depth);
     }
@@ -435,13 +455,12 @@ class EllipsisDrive {
         ? this.getRasterSVG(block.depth)
         : this.getVectorSVG(block.depth);
 
-    
     let func = () => {
       this.settings.cb(block.obj);
     };
 
-    if (available){
-      this.attachMouseEnter(div, [p1,p2], [icon], null);
+    if (available) {
+      this.attachMouseEnter(div, [p1, p2], [icon], null);
       div.onclick = func;
     } else {
       icon.style.backgroundColor = this.SVGGRAY;
@@ -488,7 +507,12 @@ class EllipsisDrive {
       };
 
       let foldericon = this.getFolderSVG(folder.id);
-      this.attachMouseEnter(startdiv, [toBeAdded], [arrow, foldericon], refresh);
+      this.attachMouseEnter(
+        startdiv,
+        [toBeAdded],
+        [arrow, foldericon],
+        refresh
+      );
 
       refresh.style.float = "right";
       refresh.style.position = "relative";
@@ -563,9 +587,7 @@ class EllipsisDrive {
     let div = document.createElement("div");
     div.appendChild(this.p("Please log in to your Ellipsis Drive account:"));
     div.style.textAlign = "center";
-    let button = this.getButton("Log in", () => {
-      window.location = `https://app.ellipsis-drive.com/login?referer=${window.location.href}`;
-    });
+    let button = this.getButton("Log in", setting.onLogInClick);
     div.appendChild(button);
     return div;
   };
@@ -622,8 +644,7 @@ class EllipsisDrive {
   };
 
   performSearch = async (text) => {
-
-    let apiurl = `${this.APIURL}/path`
+    let apiurl = `${this.APIURL}/path`;
 
     let folderurl = `${apiurl}?type=["folder"]&name=${text}`;
     let vectorurl = `${apiurl}?type=["vector"]&name=${text}`;
