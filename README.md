@@ -1,6 +1,6 @@
 ### Ellipsis Drive Folder package
 
-This package allows you to easily use display a minified Ellipsis Drive file system of a user in your app. This is needed if you wish to enable users to browse and load their Ellipsis Drive content on a map within your app.
+This package allows you to display a minified Ellipsis Drive file system in your app. This is needed if you wish to enable users to browse and load their Ellipsis Drive content on a map within your app.
 
 ![Gif of the folders package in action](https://github.com/ellipsis-drive/folders-package/blob/main/img/ellipsis_drive_demo.gif)
 
