@@ -6,7 +6,11 @@ This package allows you to display a minified Ellipsis Drive file system in your
 
 ### Installing the folder package
 
-All releases of this package are listed in the release list on github here. To install this library, simply find the latest .js file in there, and put it in the directory of your project.
+Either run
+```
+npm install ellipsis-folders
+```
+Or use the latest release file in this git repository.
 
 ### Using the package
 
