@@ -8,7 +8,7 @@ This package allows you to display a minified Ellipsis Drive file system in your
 
 Either run
 ```
-npm install ellipsis-folders
+npm install ellipsis-filesystem
 ```
 Or use the latest release file in this git repository.
 
